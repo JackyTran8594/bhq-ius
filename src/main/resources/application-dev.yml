@@ -1,0 +1,31 @@
+server:
+  port: 8400
+  servlet:
+    context-path: /dms
+app:
+  jwtSecret: test
+  tokenValidity: 28600
+
+spring:
+  application:
+    name: deviceManagementSystem
+  datasource:
+    url: jdbc:sqlserver://localhost:51964;databaseName=DeviceManagementSystem;encrypt=true;trustServerCertificate=true;
+    username: sa
+    password: 123456
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.SQLServerDialect
+  liquibase:
+    enabled: false
+logging:
+  level:
+    org:
+      hibernate:
+        sql: debug
+      springframework: debug
