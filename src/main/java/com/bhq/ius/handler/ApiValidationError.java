@@ -1,6 +1,6 @@
-package com.thanhbinh.dms.handler;
+package com.bhq.ius.handler;
 
-import com.thanhbinh.dms.utils.DataUtil;
+import com.bhq.ius.utils.DataUtil;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

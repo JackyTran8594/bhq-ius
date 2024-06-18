@@ -1,4 +1,4 @@
-package com.thanhbinh.dms.utils;
+package com.bhq.ius.utils;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;

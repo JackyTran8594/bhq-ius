@@ -1,4 +1,4 @@
-package com.thanhbinh.dms.utils;
+package com.bhq.ius.utils;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -6,10 +6,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import static com.thanhbinh.dms.utils.DataUtil.camelToSnake;
+import static com.bhq.ius.utils.DataUtil.camelToSnake;
 
 @Component
 public class CommonUtil {

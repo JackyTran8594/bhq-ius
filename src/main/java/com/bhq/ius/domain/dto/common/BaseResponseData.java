@@ -1,4 +1,4 @@
-package com.thanhbinh.dms.domain.dto.common;
+package com.bhq.ius.domain.dto.common;
 
 import lombok.Data;
 import org.springframework.data.domain.Page;

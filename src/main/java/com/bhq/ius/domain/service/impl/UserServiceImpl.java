@@ -1,14 +1,12 @@
-package com.thanhbinh.dms.domain.service.impl;
+package com.bhq.ius.domain.service.impl;
 
-import com.thanhbinh.dms.domain.dto.DeviceTypeDto;
-import com.thanhbinh.dms.domain.dto.OrganizationDto;
-import com.thanhbinh.dms.domain.entity.DeviceType;
-import com.thanhbinh.dms.domain.entity.Organization;
-import com.thanhbinh.dms.domain.repository.OrganizationRepository;
-import com.thanhbinh.dms.domain.service.OrganizationService;
-import com.thanhbinh.dms.domain.specification.GenericSpecificationBuilder;
-import com.thanhbinh.dms.domain.specification.criteria.SearchCriteria;
-import com.thanhbinh.dms.utils.DataUtil;
+import com.bhq.ius.domain.dto.UserDto;
+import com.bhq.ius.domain.entity.User;
+import com.bhq.ius.domain.repository.UserRepository;
+import com.bhq.ius.domain.service.UserService;
+import com.bhq.ius.domain.specification.GenericSpecificationBuilder;
+import com.bhq.ius.domain.specification.criteria.SearchCriteria;
+import com.bhq.ius.utils.DataUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,13 +22,13 @@ import java.util.regex.Pattern;
 
 @Service
 @Slf4j
-public class OrganizationServiceImpl implements OrganizationService {
+public class UserServiceImpl implements UserService {
 
     @Autowired
-    private OrganizationRepository repository;
+    private UserRepository repository;
     @Override
-    public Page<OrganizationDto> findBySearchParam(Optional<String> search, Pageable page) {
-        GenericSpecificationBuilder<Organization> builder = new GenericSpecificationBuilder<>();
+    public Page<UserDto> findBySearchParam(Optional<String> search, Pageable page) {
+        GenericSpecificationBuilder<User> builder = new GenericSpecificationBuilder<>();
         // check chuỗi để tách các param search
         if (DataUtil.notNull(search)) {
             Pattern pattern = Pattern.compile("(\\w+?)(\\.)(:|<|>|(\\w+?))(\\.)(\\w+?),", Pattern.UNICODE_CHARACTER_CLASS);
@@ -40,10 +38,10 @@ public class OrganizationServiceImpl implements OrganizationService {
             }
         }
         // specification
-        builder.setClazz(Organization.class);
-        Specification<Organization> spec = builder.build();
-        Page<OrganizationDto> listDTO = repository.findAll(spec, page).map(entity -> {
-            OrganizationDto dto = new OrganizationDto();
+        builder.setClazz(User.class);
+        Specification<User> spec = builder.build();
+        Page<UserDto> listDTO = repository.findAll(spec, page).map(entity -> {
+            UserDto dto = new UserDto();
             BeanUtils.copyProperties(entity, dto);
             return dto;
         });
@@ -51,16 +49,16 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public OrganizationDto create(OrganizationDto dto) {
-        Organization entity = new Organization();
+    public UserDto create(UserDto dto) {
+        User entity = new User();
         BeanUtils.copyProperties(dto, entity);
         repository.save(entity);
         return dto;
     }
 
     @Override
-    public OrganizationDto update(OrganizationDto dto) {
-        Optional<Organization> entity = repository.findById(dto.getId());
+    public UserDto update(UserDto dto) {
+        Optional<User> entity = repository.findById(dto.getId());
         if(entity.isPresent()) {
             BeanUtils.copyProperties(dto, entity);
             repository.save(entity.get());
@@ -79,9 +77,9 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public OrganizationDto findById(Long id) {
-        OrganizationDto dto = new OrganizationDto();
-        Optional<Organization> entity = repository.findById(id);
+    public UserDto findById(Long id) {
+        UserDto dto = new UserDto();
+        Optional<User> entity = repository.findById(id);
         entity.ifPresent(value -> BeanUtils.copyProperties(value, dto));
         return dto;
     }
