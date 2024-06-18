@@ -1,4 +1,4 @@
-package com.thanhbinh.dms.utils;
+package com.bhq.ius.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

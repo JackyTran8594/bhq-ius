@@ -1,7 +1,7 @@
-package com.thanhbinh.dms.domain.mapper;
+package com.bhq.ius.domain.mapper;
 
-import com.thanhbinh.dms.domain.dto.UserDto;
-import com.thanhbinh.dms.domain.entity.User;
+import com.bhq.ius.domain.dto.UserDto;
+import com.bhq.ius.domain.entity.User;
 import org.mapstruct.*;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)

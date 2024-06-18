@@ -1,8 +1,8 @@
-package com.thanhbinh.dms.domain.specification;
+package com.bhq.ius.domain.specification;
 
 
-import com.thanhbinh.dms.domain.specification.criteria.SearchCriteria;
-import com.thanhbinh.dms.domain.specification.criteria.SearchOperation;
+import com.bhq.ius.domain.specification.criteria.SearchCriteria;
+import com.bhq.ius.domain.specification.criteria.SearchOperation;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.jpa.domain.Specification;

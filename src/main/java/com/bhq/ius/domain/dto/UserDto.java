@@ -1,8 +1,6 @@
-package com.thanhbinh.dms.domain.dto;
+package com.bhq.ius.domain.dto;
 
-import com.thanhbinh.dms.domain.dto.common.BaseDto;
-import com.thanhbinh.dms.domain.entity.Role;
-import jakarta.persistence.*;
+import com.bhq.ius.domain.dto.common.BaseDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

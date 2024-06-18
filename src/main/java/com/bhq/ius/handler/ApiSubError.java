@@ -1,4 +1,4 @@
-package com.thanhbinh.dms.handler;
+package com.bhq.ius.handler;
 
 public abstract class ApiSubError {
 }

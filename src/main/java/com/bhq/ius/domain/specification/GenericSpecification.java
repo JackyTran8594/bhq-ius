@@ -1,8 +1,9 @@
-package com.thanhbinh.dms.domain.specification;
+package com.bhq.ius.domain.specification;
 
-import com.thanhbinh.dms.domain.specification.criteria.SearchCriteria;
-import com.thanhbinh.dms.domain.specification.criteria.SearchOperation;
-import com.thanhbinh.dms.utils.DataUtil;
+
+import com.bhq.ius.domain.specification.criteria.SearchCriteria;
+import com.bhq.ius.domain.specification.criteria.SearchOperation;
+import com.bhq.ius.utils.DataUtil;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
@@ -13,7 +14,6 @@ import java.lang.reflect.Field;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-import static com.thanhbinh.dms.domain.specification.criteria.SearchOperation.*;
 
 public class GenericSpecification<T> implements Specification<T> {
 

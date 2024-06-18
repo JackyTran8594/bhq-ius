@@ -1,4 +1,4 @@
-package com.thanhbinh.dms.domain.entity;
+package com.bhq.ius.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -36,9 +36,5 @@ public class User extends Auditable<String> {
 
     @Column(name = "last_login_time")
     private LocalDateTime lastLoginTime;
-
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "role_id", referencedColumnName = "id")
-    private Role role;
 
 }

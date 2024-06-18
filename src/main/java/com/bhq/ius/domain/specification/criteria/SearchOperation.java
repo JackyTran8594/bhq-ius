@@ -1,4 +1,4 @@
-package com.thanhbinh.dms.domain.specification.criteria;
+package com.bhq.ius.domain.specification.criteria;
 
 import lombok.Getter;
 
