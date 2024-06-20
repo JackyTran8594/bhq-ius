@@ -20,7 +20,7 @@ spring:
       ddl-auto: none
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.mysql8dialect
+        dialect: org.hibernate.dialect.MySQL8Dialect
   liquibase:
     enabled: false
 logging:
