@@ -16,6 +16,7 @@ public class JwtAuthenticationConfig {
             try {
                 auth.requestMatchers("/").permitAll()
                         .requestMatchers("/api/**").permitAll()
+                        .requestMatchers("/private/api/v1/report-one/**").permitAll()
                         .requestMatchers("/swagger*/**").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-resources", "/swagger-ui.html").permitAll()

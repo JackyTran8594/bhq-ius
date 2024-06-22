@@ -85,6 +85,9 @@ public class Profile extends Auditable<String> {
     @Column(name = "MA_NOI_HOC_LAIXE")
     private String maNoiHocLaiXe;
 
+    @Column(name = "TEN_NOI_HOC_LAIXE")
+    private String tenNoiHocLaiXe;
+
     @Column(name = "NAM_HOC_LAIXE")
     private String namHocLaiXe;
 

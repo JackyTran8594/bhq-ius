@@ -89,6 +89,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct-processor</artifactId>
+			<version>${org.mapstruct.version}</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.apache.maven.plugins</groupId>
 			<artifactId>maven-help-plugin</artifactId>
 			<version>3.4.0</version>

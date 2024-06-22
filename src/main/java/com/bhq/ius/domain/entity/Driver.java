@@ -65,6 +65,9 @@ public class Driver extends Auditable<String> {
     @Column(name = "NGAY_CAP_CMT")
     private String ngayCapCMT;
 
+    @Column(name = "NOI_CAP_CMT")
+    private String noiCAPCMT;
+
     @Column(name = "GIOI_TINH")
     private String gioiTinh;
 

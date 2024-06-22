@@ -68,7 +68,7 @@ public class Course extends Auditable<String> {
     private LocalDateTime ngayKhaiGiang;
 
     @Column(name = "NGAY_BE_GIANG")
-    private LocalDateTime maGiayTo;
+    private LocalDateTime ngayBeGiang;
 
     @Column(name = "SO_QD_KG")
     private String soQDKG;
