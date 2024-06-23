@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Getter
@@ -53,7 +54,7 @@ public class Profile extends Auditable<String> {
     private String chatLuongAnh;
 
     @Column(name = "NGAY_THU_NHAN_ANH")
-    private String ngayThuNhanAnh;
+    private LocalDateTime ngayThuNhanAnh;
 
     @Column(name = "NGUOI_THU_NHAN_ANH", columnDefinition = "NVARCHAR(200)")
     private String nguoiThuNhanAnh;

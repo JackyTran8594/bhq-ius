@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @Entity
@@ -33,7 +35,7 @@ public class Driver extends Auditable<String> {
     private String hoVaTen;
 
     @Column(name = "NGAY_SINH")
-    private String ngaySinh;
+    private LocalDateTime ngaySinh;
 
     @Column(name = "MA_QUOC_TICH")
     private String maQuocTich;
@@ -63,7 +65,7 @@ public class Driver extends Auditable<String> {
     private String soCMT;
 
     @Column(name = "NGAY_CAP_CMT")
-    private String ngayCapCMT;
+    private LocalDateTime ngayCapCMT;
 
     @Column(name = "NOI_CAP_CMT")
     private String noiCAPCMT;
