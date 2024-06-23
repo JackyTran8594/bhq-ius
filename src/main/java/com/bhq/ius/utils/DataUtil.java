@@ -244,6 +244,14 @@ public class DataUtil {
         return LocalDateTime.parse(value, formatter);
     }
 
+    public static LocalDate convertStringToLocalDate(String value, String format) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+        if (value == null) {
+            return null;
+        }
+        return LocalDate.parse(value, formatter);
+    }
+
     public static String localDateToString(LocalDate value, String format) {
         if (!notNull(value)) {
             return null;
@@ -407,6 +415,19 @@ public class DataUtil {
         }
 
         throw new IllegalArgumentException("Don't know how to instantiate " + className);
+    }
+
+    public static final String convertDateOfBirthWithFormat(String date) {
+        try {
+              String year = date.substring(0,4);
+              String month = date.substring(4,6);
+              String day = date.substring(6,8);
+              String result = year + "-" + month + "-" + day;
+              return result;
+        } catch (Exception e) {
+            log.error("==== convertDateOfBirthToLocalDate ==== {}", e.getMessage());
+            return date;
+        }
     }
 
 }

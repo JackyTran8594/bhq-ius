@@ -17,6 +17,9 @@ public class Document extends Auditable<String> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "uuid")
+    private String uuid;
+
     @Column(name = "SO_CMT", length = 50)
     private String soCMT;
 
@@ -29,8 +32,8 @@ public class Document extends Auditable<String> {
     @Column(name = "TEN_GIAY_TO", columnDefinition = "NVARCHAR(500)")
     private String tenGiayTo;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "profile_id", referencedColumnName = "id")
-    private Profile profile;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "driver_uuid", referencedColumnName = "uuid")
+    private Driver driver;
 
 }

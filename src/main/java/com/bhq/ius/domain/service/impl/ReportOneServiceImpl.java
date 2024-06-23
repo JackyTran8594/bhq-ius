@@ -1,5 +1,6 @@
 package com.bhq.ius.domain.service.impl;
 
+import com.bhq.ius.constant.IusConstant;
 import com.bhq.ius.constant.XmlElement;
 import com.bhq.ius.domain.dto.*;
 import com.bhq.ius.domain.entity.Course;
@@ -16,8 +17,8 @@ import com.bhq.ius.domain.repository.ProfileRepository;
 import com.bhq.ius.domain.service.ReportOneService;
 import com.bhq.ius.utils.DataUtil;
 import com.bhq.ius.utils.XmlUtil;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,10 +30,8 @@ import org.w3c.dom.NodeList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -51,6 +50,7 @@ public class ReportOneServiceImpl implements ReportOneService {
     private CourseRepository courseRepository;
 
     @Override
+    @Transactional
     public List<DriverDto> uploadFileXml(MultipartFile multipartFile) {
         try {
             DriverXmlDto dto = new DriverXmlDto();
@@ -74,32 +74,17 @@ public class ReportOneServiceImpl implements ReportOneService {
             for (int i = 0; i < nodeListDriver.getLength(); i++) {
                 Node node = nodeListDriver.item(i);
                 if (node.getNodeType() == Node.ELEMENT_NODE && XmlElement.NGUOI_LX.name().equals(node.getNodeName())) {
-                    dto.getDriversDto().add(getDriver(node));
-                }
-                String soCMT = DataUtil.isNullOrEmpty(dto.getDriversDto().get(i).getSoCMT()) ? "NULL" : dto.getDriversDto().get(i).getSoCMT();
-                String soCMTCu = DataUtil.isNullOrEmpty(dto.getDriversDto().get(i).getSoCMTCu()) ? "NULL" : dto.getDriversDto().get(i).getSoCMTCu();
-                if (node.getNodeType() == Node.ELEMENT_NODE && XmlElement.HO_SO.name().equals(node.getNodeName())) {
+                    DriverDto driverDto = getDriver(node);
+                    dto.getDriversDto().add(driverDto);
+                    String soCMT = DataUtil.isNullOrEmpty(dto.getDriversDto().get(i).getSoCMT()) ? "NULL" : dto.getDriversDto().get(i).getSoCMT();
+                    String soCMTCu = DataUtil.isNullOrEmpty(dto.getDriversDto().get(i).getSoCMTCu()) ? "NULL" : dto.getDriversDto().get(i).getSoCMTCu();
+                    String uuid = driverDto.getUuid();
                     Element element = (Element) node;
                     NodeList childNodeProfile = XmlUtil.getNodeWithTag(XmlElement.HO_SO.name(), element);
-                    dto.getProfilesDto().add(getProfile(childNodeProfile, soCMT, soCMTCu));
-                }
-                if (node.getNodeType() == Node.ELEMENT_NODE && XmlElement.GIAY_TOS.name().equals(node.getNodeName())) {
-                    Element element = (Element) node;
+                    dto.getProfilesDto().add(getProfile(childNodeProfile, soCMT, soCMTCu, uuid));
                     NodeList childNodeDocument = XmlUtil.getNodeWithTag(XmlElement.GIAY_TO.name(), element);
-                    dto.getDocumentsDto().add(getDocument(childNodeDocument, soCMT, soCMTCu));
+                    dto.getDocumentsDto().addAll(getDocument(childNodeDocument, soCMT, soCMTCu, uuid));
                 }
-
-//                NodeList childNodeDriver = node.getChildNodes();
-//                for (int j = 0; j < childNodeDriver.getLength(); j ++) {
-//                    Node childNode = childNodeDriver.item(j);
-//                    if (childNode.getNodeType() == Node.ELEMENT_NODE && XmlElement.HO_SO.name().equals(childNode.getNodeName())) {
-//                        dto.getProfilesDto().add(getProfile(childNode, soCMT, soCMTCu));
-//                    }
-//                    if (childNode.getNodeType() == Node.ELEMENT_NODE && XmlElement.GIAY_TOS.name().equals(childNode.getNodeName())) {
-//                        dto.getDocumentsDto().add(getDocument(childNode, soCMT, soCMTCu));
-//                    }
-//                }
-
 
             }
 
@@ -118,11 +103,28 @@ public class ReportOneServiceImpl implements ReportOneService {
         List<com.bhq.ius.domain.entity.Document> documents = DocumentMapper.INSTANCE.toEntities(dto.getDocumentsDto());
         List<Driver> drivers = DriverMapper.INSTANCE.toEntities(dto.getDriversDto());
         List<Profile> profiles = ProfileMapper.INSTANCE.toEntities(dto.getProfilesDto());
+        for (Driver driver: drivers) {
+            List<com.bhq.ius.domain.entity.Document> doc = documents.stream().filter(x -> x.getSoCMT().equals(driver.getSoCMT())).map( x -> {
+//                x.setDriver(driver);
+                return x;
+            }).toList();
+            Optional<Profile> profile = profiles.stream().filter(x -> x.getSoCMT().equals(driver.getSoCMT())).map( x->{
+//                x.setUuid(driver.getUuid());
+                return x;
+            }).findFirst();
+            driver.setDocument(new HashSet<>());
+            driver.getDocument().addAll(doc);
+            if(profile.isPresent()) {
+                driver.setProfile(profile.get());
+            }
+            driverRepository.save(driver);
+        }
+
 
         courseRepository.save(course);
-        drivers = driverRepository.saveAll(drivers);
-        profileRepository.saveAll(profiles);
-        documentRepository.saveAll(documents);
+//        drivers = driverRepository.saveAll(drivers);
+//        profileRepository.saveAll(profiles);
+//        documentRepository.saveAll(documents);
 
         dto.setDriversDto(DriverMapper.INSTANCE.toListDto(drivers));
 
@@ -138,7 +140,13 @@ public class ReportOneServiceImpl implements ReportOneService {
                 driverDto.setHoTenDem(XmlUtil.getTagValue("HO_TEN_DEM", element));
                 driverDto.setTen(XmlUtil.getTagValue("TEN", element));
                 driverDto.setHoVaTen(XmlUtil.getTagValue("HO_VA_TEN", element));
-                driverDto.setNgaySinh(XmlUtil.getTagValue("NGAY_SINH", element));
+
+
+                if(!DataUtil.isNullOrEmpty(XmlUtil.getTagValue("NGAY_SINH", element))) {
+                    String ngaySinh = DataUtil.convertDateOfBirthWithFormat(XmlUtil.getTagValue("NGAY_SINH", element));
+                    driverDto.setNgaySinh(DataUtil.convertStringToLocalDate(ngaySinh, IusConstant.DATE_FORMAT));
+                }
+
                 driverDto.setTenQuocTich(XmlUtil.getTagValue("TEN_QUOC_TICH", element));
                 driverDto.setNoiTT(XmlUtil.getTagValue("NOI_TT", element));
                 driverDto.setNoiTTMaDvhc(XmlUtil.getTagValue("NOI_TT_MA_DVHC", element));
@@ -147,11 +155,17 @@ public class ReportOneServiceImpl implements ReportOneService {
                 driverDto.setNoiCTMaDvhc(XmlUtil.getTagValue("NOI_CT_MA_DVHC", element));
                 driverDto.setNoiCTMaDvql(XmlUtil.getTagValue("NOI_CT_MA_DVQL", element));
                 driverDto.setSoCMT(XmlUtil.getTagValue("SO_CMT", element));
-                driverDto.setNgayCapCMT(XmlUtil.getTagValue("NGAY_CAP_CMT", element));
+
+                String ngayCapCMT = XmlUtil.getTagValue("NGAY_CAP_CMT", element);
+                if(!DataUtil.isNullOrEmpty(ngayCapCMT)) {
+                    driverDto.setNgaySinh(DataUtil.convertStringToLocalDate(ngayCapCMT, IusConstant.DATE_FORMAT));
+                }
+
                 driverDto.setNoiCapCMT(XmlUtil.getTagValue("NOI_CAP_CMT", element));
                 driverDto.setGioiTinh(XmlUtil.getTagValue("GIOI_TINH", element));
                 driverDto.setHoVaTenIn(XmlUtil.getTagValue("HO_VA_TEN_IN", element));
                 driverDto.setSoCMTCu(XmlUtil.getTagValue("SO_CMND_CU", element));
+                driverDto.setUuid(UUID.randomUUID().toString());
             }
             return driverDto;
         } catch (Exception e) {
@@ -175,15 +189,39 @@ public class ReportOneServiceImpl implements ReportOneService {
                 courseDto.setMaHangDaoTao(XmlUtil.getTagValue("MA_HANG_DAO_TAO", element));
                 courseDto.setHangGPLX(XmlUtil.getTagValue("HANG_GPLX", element));
                 courseDto.setSoBCI(XmlUtil.getTagValue("SO_BCI", element));
-                courseDto.setNgayBCI(XmlUtil.getTagValue("NGAY_BCI", element));
+
+                String ngayBCi = XmlUtil.getTagValue("NGAY_BCI", element);
+                if(!DataUtil.isNullOrEmpty(ngayBCi)) {
+                    courseDto.setNgayBCI(DataUtil.convertStringToLocalDate(ngayBCi, IusConstant.DATE_FORMAT));
+                }
+
                 courseDto.setLuuLuong(XmlUtil.getTagValue("LUU_LUONG", element));
                 courseDto.setSoHocSinh(XmlUtil.getTagValue("SO_HOC_SINH", element));
-                courseDto.setNgayKhaiGiang(XmlUtil.getTagValue("NGAY_KHAI_GIANG", element));
-                courseDto.setNgayBeGiang(XmlUtil.getTagValue("NGAY_BE_GIANG", element));
+
+                String ngayKhaiGiang = XmlUtil.getTagValue("NGAY_KHAI_GIANG", element);
+                if(!DataUtil.isNullOrEmpty(ngayKhaiGiang)) {
+                    courseDto.setNgayKhaiGiang(DataUtil.convertStringToLocalDate(ngayKhaiGiang, IusConstant.DATE_FORMAT));
+                }
+
+                String ngayBeGiang = XmlUtil.getTagValue("NGAY_BE_GIANG", element);
+                if(!DataUtil.isNullOrEmpty(ngayBeGiang)) {
+                    courseDto.setNgayBeGiang(DataUtil.convertStringToLocalDate(ngayBeGiang, IusConstant.DATE_FORMAT));
+                }
+
                 courseDto.setSoQDKG(XmlUtil.getTagValue("SO_QD_KG", element));
-                courseDto.setNgayQDKG(XmlUtil.getTagValue("NGAY_QD_KG", element));
-                courseDto.setNgaySatHach(XmlUtil.getTagValue("NGAY_SAT_HACH", element));
+
+                String ngayQDKG = XmlUtil.getTagValue("NGAY_QD_KG", element);
+                if(!DataUtil.isNullOrEmpty(ngayQDKG)) {
+                    courseDto.setNgayQDKG(DataUtil.convertStringToLocalDate(ngayQDKG, IusConstant.DATE_FORMAT));
+                }
+
+                String ngaySatHach = XmlUtil.getTagValue("NGAY_SAT_HACH", element);
+                if(!DataUtil.isNullOrEmpty(ngaySatHach)) {
+                    courseDto.setNgaySatHach(DataUtil.convertStringToLocalDate(ngaySatHach, IusConstant.DATE_FORMAT));
+                }
+
                 courseDto.setThoiGianDT(XmlUtil.getTagValue("THOI_GIAN_DT", element));
+                courseDto.setUuid(UUID.randomUUID().toString());
             }
             return courseDto;
         } catch (Exception e) {
@@ -192,7 +230,7 @@ public class ReportOneServiceImpl implements ReportOneService {
         }
     }
 
-    private ProfileDto getProfile(NodeList nodeList, String soCMT, String soCMTCu) {
+    private ProfileDto getProfile(NodeList nodeList, String soCMT, String soCMTCu, String uuid) {
         try {
             ProfileDto dto = new ProfileDto();
             for (int j = 0; j < nodeList.getLength(); j ++) {
@@ -202,22 +240,42 @@ public class ReportOneServiceImpl implements ReportOneService {
                     dto.setSoHoSo(XmlUtil.getTagValue("SO_HO_SO", element));
                     dto.setMaDVNhanHoSo(XmlUtil.getTagValue("MA_DV_NHAN_HOSO", element));
                     dto.setTenDVNhanHoSo(XmlUtil.getTagValue("TEN_DV_NHAN_HOSO", element));
-                    dto.setNgayNhanHoSo(XmlUtil.getTagValue("NGAY_NHAN_HOSO", element));
+                    String ngayNhanHoSo = XmlUtil.getTagValue("NGAY_NHAN_HOSO", element);
+
+                    if(!DataUtil.isNullOrEmpty(ngayNhanHoSo)) {
+                        dto.setNgayNhanHoSo(DataUtil.convertStringToLocalDate(ngayNhanHoSo, IusConstant.DATE_FORMAT));
+                    }
+
                     dto.setNguoiNhanHoSo(XmlUtil.getTagValue("NGUOI_NHAN_HOSO", element));
                     dto.setMaLoaiHoSo(XmlUtil.getTagValue("MA_LOAI_HOSO", element));
                     dto.setTenLoaiHoSo(XmlUtil.getTagValue("TEN_LOAI_HOSO", element));
                     dto.setAnhChanDung(XmlUtil.getTagValue("ANH_CHAN_DUNG", element));
                     dto.setChatLuongAnh(XmlUtil.getTagValue("CHAT_LUONG_ANH", element));
-                    dto.setNgayThuNhanAnh(XmlUtil.getTagValue("NGAY_THU_NHAN_ANH", element));
+
+                    String ngayThuNhanAnh = XmlUtil.getTagValue("NGAY_THU_NHAN_ANH", element);
+                    if(!DataUtil.isNullOrEmpty(ngayThuNhanAnh)) {
+                        dto.setNgayThuNhanAnh(DataUtil.convertStringToLocalDate(ngayThuNhanAnh, IusConstant.DATE_FORMAT));
+                    }
+
                     dto.setNguoiThuNhanAnh(XmlUtil.getTagValue("NGUOI_THU_NHAN_ANH", element));
                     dto.setSoGPLXDaCo(XmlUtil.getTagValue("SO_GPLX_DA_CO", element));
                     dto.setHangGPLXDaCo(XmlUtil.getTagValue("HANG_GPLX_DA_CO", element));
                     dto.setDvCapGPLXDaCo(XmlUtil.getTagValue("DV_CAP_GPLX_DACO", element));
                     dto.setTenDVCapGPLXDaCo(XmlUtil.getTagValue("TEN_DV_CAP_GPLX_DACO", element));
                     dto.setNoiCapGPLXDaCo(XmlUtil.getTagValue("NOI_CAP_GPLX_DACO", element));
-                    dto.setNgayCapGPLXDaCo(XmlUtil.getTagValue("NGAY_CAP_GPLX_DACO", element));
-                    dto.setNgayHHGPLXDaCo(XmlUtil.getTagValue("NGAY_HH_GPLX_DACO", element));
-                    dto.setNgayTTGPLXDaCo(XmlUtil.getTagValue("NGAY_TT_GPLX_DACO", element));
+
+                    String ngayCapGPLXDaCo = XmlUtil.getTagValue("NGAY_CAP_GPLX_DACO", element);
+                    if(!DataUtil.isNullOrEmpty(ngayCapGPLXDaCo)) {
+                        dto.setNgayCapGPLXDaCo(DataUtil.convertStringToLocalDate(ngayCapGPLXDaCo, IusConstant.DATE_FORMAT));
+                    }
+                    String ngayHHGPLXDaCo = XmlUtil.getTagValue("NGAY_CAP_GPLX_DACO", element);
+                    if(!DataUtil.isNullOrEmpty(ngayHHGPLXDaCo)) {
+                        dto.setNgayHHGPLXDaCo(DataUtil.convertStringToLocalDate(ngayHHGPLXDaCo, IusConstant.DATE_FORMAT));
+                    }
+                    String ngayTTGPLXDaCo = XmlUtil.getTagValue("NGAY_TT_GPLX_DACO", element);
+                    if(!DataUtil.isNullOrEmpty(ngayTTGPLXDaCo)) {
+                        dto.setNgayTTGPLXDaCo(DataUtil.convertStringToLocalDate(ngayTTGPLXDaCo, IusConstant.DATE_FORMAT));
+                    }
                     dto.setMaNoiHocLaiXe(XmlUtil.getTagValue("MA_NOI_HOC_LAIXE", element));
                     dto.setTenNoiHocLaiXe(XmlUtil.getTagValue("TEN_NOI_HOC_LAIXE", element));
                     dto.setNamHocLaiXe(XmlUtil.getTagValue("NAM_HOC_LAIXE", element));
@@ -228,12 +286,13 @@ public class ReportOneServiceImpl implements ReportOneService {
                     dto.setHangGPLX(XmlUtil.getTagValue("HANG_GPLX", element));
                     dto.setHangDaoTao(XmlUtil.getTagValue("HANG_DAOTAO", element));
                     dto.setChonInGPLX(XmlUtil.getTagValue("CHON_IN_GPLX", element));
-                    if (DataUtil.isNullOrEmpty(soCMT)) {
+                    if (!DataUtil.isNullOrEmpty(soCMT)) {
                         dto.setSoCMT(soCMT);
                     }
-                    if (DataUtil.isNullOrEmpty(soCMTCu)) {
+                    if (!DataUtil.isNullOrEmpty(soCMTCu)) {
                         dto.setSoCMTCu(soCMTCu);
                     }
+                    dto.setDriver_uuid(uuid);
                 }
             }
             return dto;
@@ -243,24 +302,27 @@ public class ReportOneServiceImpl implements ReportOneService {
         }
     }
 
-    private DocumentDto getDocument(NodeList nodeList, String soCMT, String soCMTCu) {
+    private List<DocumentDto> getDocument(NodeList nodeList, String soCMT, String soCMTCu, String uuid) {
         try {
-            DocumentDto dto = new DocumentDto();
+            List<DocumentDto> listDto = new ArrayList<>();
             for (int j = 0; j < nodeList.getLength(); j ++) {
                 Node childNode = nodeList.item(j);
+                DocumentDto dto = new DocumentDto();
                 if (childNode.getNodeType() == Node.ELEMENT_NODE && XmlElement.GIAY_TO.name().equals(childNode.getNodeName())) {
                     Element element = (Element) childNode;
                     dto.setMaGiayTo(XmlUtil.getTagValue("MA_GIAY_TO", element));
                     dto.setTenGiayTo(XmlUtil.getTagValue("TEN_GIAY_TO", element));
-                    if(DataUtil.isNullOrEmpty(soCMT)) {
+                    if(!DataUtil.isNullOrEmpty(soCMT)) {
                         dto.setSoCMT(soCMT);
                     }
-                    if(DataUtil.isNullOrEmpty(soCMTCu)) {
+                    if(!DataUtil.isNullOrEmpty(soCMTCu)) {
                         dto.setSoCMTCu(soCMTCu);
                     }
+                    dto.setDriver_uuid(uuid);
+                    listDto.add(dto);
                 }
             }
-            return dto;
+            return listDto;
         } catch (Exception e) {
             log.error("==== error in getCourse ==== {}", e.getMessage());
             throw new RuntimeException(e.getMessage());

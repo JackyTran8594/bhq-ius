@@ -15,4 +15,6 @@ public class DocumentDto extends BaseDto<String> {
 
     private String tenGiayTo;
 
+    private String driver_uuid;
+
 }

@@ -2,7 +2,10 @@ package com.bhq.ius.domain.dto;
 
 import com.bhq.ius.domain.dto.common.BaseDto;
 import lombok.*;
+import org.springframework.cglib.core.Local;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Data
@@ -19,7 +22,7 @@ public class ProfileDto extends BaseDto<String> {
 
     private String tenDVNhanHoSo;
 
-    private String ngayNhanHoSo;
+    private LocalDate ngayNhanHoSo;
 
     private String nguoiNhanHoSo;
 
@@ -31,7 +34,7 @@ public class ProfileDto extends BaseDto<String> {
 
     private String chatLuongAnh;
 
-    private String ngayThuNhanAnh;
+    private LocalDate ngayThuNhanAnh;
 
     private String nguoiThuNhanAnh;
 
@@ -45,11 +48,11 @@ public class ProfileDto extends BaseDto<String> {
 
     private String noiCapGPLXDaCo;
 
-    private String ngayCapGPLXDaCo;
+    private LocalDate ngayCapGPLXDaCo;
 
-    private String ngayHHGPLXDaCo;
+    private LocalDate ngayHHGPLXDaCo;
 
-    private String ngayTTGPLXDaCo;
+    private LocalDate ngayTTGPLXDaCo;
 
     private String maNoiHocLaiXe;
 
@@ -70,5 +73,7 @@ public class ProfileDto extends BaseDto<String> {
     private String hangDaoTao;
 
     private String chonInGPLX;
+
+    private String driver_uuid;
 
 }

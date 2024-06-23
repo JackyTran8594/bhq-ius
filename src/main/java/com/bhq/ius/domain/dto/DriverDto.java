@@ -3,6 +3,9 @@ package com.bhq.ius.domain.dto;
 import com.bhq.ius.domain.dto.common.BaseDto;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Data
 public class DriverDto extends BaseDto<String> {
     private Long id;
@@ -17,7 +20,7 @@ public class DriverDto extends BaseDto<String> {
 
     private String hoVaTen;
 
-    private String ngaySinh;
+    private LocalDate ngaySinh;
 
     private String maQuocTich;
 
@@ -37,7 +40,7 @@ public class DriverDto extends BaseDto<String> {
 
     private String soCMT;
 
-    private String ngayCapCMT;
+    private LocalDate ngayCapCMT;
 
     private String noiCapCMT;
 
@@ -46,5 +49,7 @@ public class DriverDto extends BaseDto<String> {
     private String hoVaTenIn;
 
     private String soCMTCu;
+
+    private String uuid;
 
 }

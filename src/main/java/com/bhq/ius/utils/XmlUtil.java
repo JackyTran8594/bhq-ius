@@ -16,11 +16,11 @@ public class XmlUtil {
         if (!DataUtil.isNullOrEmpty(node)) {
             return node.getNodeValue();
         }
-        return "NULL";
+        return "";
     }
 
     public static NodeList getNodeWithTag(String tag, Element element) {
-        NodeList nodeList = element.getElementsByTagName(tag).item(0).getChildNodes();
+        NodeList nodeList = element.getElementsByTagName(tag);
         return nodeList;
     }
 

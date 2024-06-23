@@ -3,6 +3,7 @@ package com.bhq.ius.domain.dto;
 import com.bhq.ius.domain.dto.common.BaseDto;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -33,24 +34,25 @@ public class CourseDto extends BaseDto<String> {
 
     private String soBCI;
 
-    private String ngayBCI;
+    private LocalDate ngayBCI;
 
     private String luuLuong;
 
     private String soHocSinh;
 
-    private String ngayKhaiGiang;
+    private LocalDate ngayKhaiGiang;
 
-    private String ngayBeGiang;
+    private LocalDate ngayBeGiang;
 
     private String maGiayTo;
 
     private String soQDKG;
 
-    private String ngayQDKG;
+    private LocalDate ngayQDKG;
 
-    private String ngaySatHach;
+    private LocalDate ngaySatHach;
 
     private String thoiGianDT;
+    private String uuid;
 
 }

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -19,6 +20,9 @@ public class Profile extends Auditable<String> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "uuid")
+    private String uuid;
 
     @Column(name = "SO_CMT", length = 50)
     private String soCMT;
@@ -54,7 +58,7 @@ public class Profile extends Auditable<String> {
     private String chatLuongAnh;
 
     @Column(name = "NGAY_THU_NHAN_ANH")
-    private LocalDateTime ngayThuNhanAnh;
+    private LocalDate ngayThuNhanAnh;
 
     @Column(name = "NGUOI_THU_NHAN_ANH", columnDefinition = "NVARCHAR(200)")
     private String nguoiThuNhanAnh;
@@ -75,13 +79,13 @@ public class Profile extends Auditable<String> {
     private String noiCapGPLXDaCo;
 
     @Column(name = "NGAY_CAP_GPLX_DACO")
-    private String ngayCapGPLXDaCo;
+    private LocalDate ngayCapGPLXDaCo;
 
     @Column(name = "NGAY_HH_GPLX_DACO")
-    private String ngayHHGPLXDaCo;
+    private LocalDate ngayHHGPLXDaCo;
 
     @Column(name = "NGAY_TT_GPLX_DACO")
-    private String ngayTTGPLXDaCo;
+    private LocalDate ngayTTGPLXDaCo;
 
     @Column(name = "MA_NOI_HOC_LAIXE")
     private String maNoiHocLaiXe;
@@ -113,10 +117,8 @@ public class Profile extends Auditable<String> {
     @Column(name = "CHON_IN_GPLX")
     private String chonInGPLX;
 
-    @OneToOne(mappedBy = "profile")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "driver_uuid", referencedColumnName = "uuid")
     private Driver driver;
-
-    @OneToMany(mappedBy = "profile")
-    private Set<Document> document;
 
 }

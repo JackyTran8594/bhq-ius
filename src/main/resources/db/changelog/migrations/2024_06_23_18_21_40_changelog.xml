@@ -1,13 +1,13 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
-    <changeSet author="BACHTUVU (generated)" id="1719076635310-1">
-        <addColumn tableName="driver">
-            <column name="noi_cap_cmt" type="varchar(255)"/>
+    <changeSet author="BACHTUVU (generated)" id="1719166911058-1">
+        <addColumn tableName="document">
+            <column name="driver_uuid" type="varchar(255)"/>
         </addColumn>
     </changeSet>
-    <changeSet author="BACHTUVU (generated)" id="1719076635310-2">
+    <changeSet author="BACHTUVU (generated)" id="1719166911058-2">
         <addColumn tableName="profile">
-            <column name="ten_noi_hoc_laixe" type="varchar(255)"/>
+            <column name="driver_uuid" type="varchar(255)"/>
         </addColumn>
     </changeSet>
 </databaseChangeLog>
