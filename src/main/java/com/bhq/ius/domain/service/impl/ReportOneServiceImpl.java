@@ -105,28 +105,21 @@ public class ReportOneServiceImpl implements ReportOneService {
         List<Profile> profiles = ProfileMapper.INSTANCE.toEntities(dto.getProfilesDto());
         for (Driver driver: drivers) {
             List<com.bhq.ius.domain.entity.Document> doc = documents.stream().filter(x -> x.getSoCMT().equals(driver.getSoCMT())).map( x -> {
-//                x.setDriver(driver);
+                x.setDriver(driver);
                 return x;
             }).toList();
             Optional<Profile> profile = profiles.stream().filter(x -> x.getSoCMT().equals(driver.getSoCMT())).map( x->{
-//                x.setUuid(driver.getUuid());
+                x.setDriver(driver);
                 return x;
             }).findFirst();
-            driver.setDocument(new HashSet<>());
-            driver.getDocument().addAll(doc);
-            if(profile.isPresent()) {
-                driver.setProfile(profile.get());
-            }
             driverRepository.save(driver);
         }
 
-
         courseRepository.save(course);
-//        drivers = driverRepository.saveAll(drivers);
-//        profileRepository.saveAll(profiles);
-//        documentRepository.saveAll(documents);
-
         dto.setDriversDto(DriverMapper.INSTANCE.toListDto(drivers));
+        profileRepository.saveAll(profiles);
+        documentRepository.saveAll(documents);
+
 
     }
 

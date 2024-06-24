@@ -32,7 +32,7 @@ public class Document extends Auditable<String> {
     @Column(name = "TEN_GIAY_TO", columnDefinition = "NVARCHAR(500)")
     private String tenGiayTo;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "driver_uuid", referencedColumnName = "uuid")
     private Driver driver;
 
