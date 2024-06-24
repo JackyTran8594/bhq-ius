@@ -2,6 +2,7 @@ package com.bhq.ius.domain.mapper;
 
 import com.bhq.ius.domain.dto.CourseDto;
 import com.bhq.ius.domain.entity.Course;
+import com.bhq.ius.integration.dto.MoodleCourse;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 

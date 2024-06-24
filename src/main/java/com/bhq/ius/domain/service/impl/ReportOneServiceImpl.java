@@ -97,6 +97,13 @@ public class ReportOneServiceImpl implements ReportOneService {
         }
     }
 
+    @Override
+    public boolean submitReport(List<Long> listId) {
+
+
+
+    }
+
     private void saveIntoDb(DriverXmlDto dto) {
 
         Course course = CourseMapper.INSTANCE.toEntity(dto.getCourseDto());

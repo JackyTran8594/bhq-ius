@@ -12,4 +12,6 @@ import java.util.Optional;
 public interface ReportOneService {
     List<DriverDto> uploadFileXml(MultipartFile multipartFile);
 
+    boolean submitReport(List<Long> listId);
+
 }

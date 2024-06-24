@@ -1,14 +1,12 @@
 package com.bhq.ius.domain.service.impl;
 
-import com.bhq.ius.constant.XmlElement;
-import com.bhq.ius.domain.dto.*;
-import com.bhq.ius.domain.entity.Driver;
-import com.bhq.ius.domain.repository.DriverRepository;
-import com.bhq.ius.domain.service.DriverService;
+import com.bhq.ius.domain.dto.DocumentDto;
+import com.bhq.ius.domain.entity.Document;
+import com.bhq.ius.domain.repository.DocumentRepository;
+import com.bhq.ius.domain.service.DocumentService;
 import com.bhq.ius.domain.specification.GenericSpecificationBuilder;
 import com.bhq.ius.domain.specification.criteria.SearchCriteria;
 import com.bhq.ius.utils.DataUtil;
-import com.bhq.ius.utils.XmlUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,15 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -32,13 +22,14 @@ import java.util.regex.Pattern;
 
 @Service
 @Slf4j
-public class DriverServiceImpl implements DriverService {
+public class DocumentServiceImpl implements DocumentService {
 
     @Autowired
-    private DriverRepository repository;
+    private DocumentRepository repository;
+
     @Override
-    public Page<DriverDto> findBySearchParam(Optional<String> search, Pageable page) {
-        GenericSpecificationBuilder<Driver> builder = new GenericSpecificationBuilder<>();
+    public Page<DocumentDto> findBySearchParam(Optional<String> search, Pageable page) {
+        GenericSpecificationBuilder<Document> builder = new GenericSpecificationBuilder<>();
         // check chuỗi để tách các param search
         if (DataUtil.notNull(search)) {
             Pattern pattern = Pattern.compile("(\\w+?)(\\.)(:|<|>|(\\w+?))(\\.)(\\w+?),", Pattern.UNICODE_CHARACTER_CLASS);
@@ -48,10 +39,10 @@ public class DriverServiceImpl implements DriverService {
             }
         }
         // specification
-        builder.setClazz(Driver.class);
-        Specification<Driver> spec = builder.build();
-        Page<DriverDto> listDTO = repository.findAll(spec, page).map(entity -> {
-            DriverDto dto = new DriverDto();
+        builder.setClazz(Document.class);
+        Specification<Document> spec = builder.build();
+        Page<DocumentDto> listDTO = repository.findAll(spec, page).map(entity -> {
+            DocumentDto dto = new DocumentDto();
             BeanUtils.copyProperties(entity, dto);
             return dto;
         });
@@ -59,17 +50,17 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public DriverDto create(DriverDto dto) {
-        Driver entity = new Driver();
+    public DocumentDto create(DocumentDto dto) {
+        Document entity = new Document();
         BeanUtils.copyProperties(dto, entity);
         repository.save(entity);
         return dto;
     }
 
     @Override
-    public DriverDto update(DriverDto dto) {
-        Optional<Driver> entity = repository.findById(dto.getId());
-        if(entity.isPresent()) {
+    public DocumentDto update(DocumentDto dto) {
+        Optional<Document> entity = repository.findById(dto.getId());
+        if (entity.isPresent()) {
             BeanUtils.copyProperties(dto, entity);
             repository.save(entity.get());
         }
@@ -87,21 +78,10 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public DriverDto findById(Long id) {
-        DriverDto dto = new DriverDto();
-        Optional<Driver> entity = repository.findById(id);
+    public DocumentDto findById(Long id) {
+        DocumentDto dto = new DocumentDto();
+        Optional<Document> entity = repository.findById(id);
         entity.ifPresent(value -> BeanUtils.copyProperties(value, dto));
         return dto;
     }
-
-    @Override
-    public List<Driver> findByListId(List<Long> listId) {
-        return repository.findAllById(listId);
-    }
-
-    @Override
-    public List<Driver> findAll() {
-        return repository.findAll();
-    }
-
 }

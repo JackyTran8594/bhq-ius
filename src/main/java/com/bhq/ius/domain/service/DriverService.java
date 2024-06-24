@@ -1,10 +1,9 @@
 package com.bhq.ius.domain.service;
 
 import com.bhq.ius.domain.dto.DriverDto;
-import com.bhq.ius.domain.dto.UserDto;
+import com.bhq.ius.domain.entity.Driver;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +15,8 @@ public interface DriverService {
     void deleteById(Long id);
     void deleteByListId(List<Long> listId);
     DriverDto findById(Long id);
+    List<Driver> findByListId(List<Long> listId);
+    List<Driver> findAll();
 
 
 }
