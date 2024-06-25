@@ -45,4 +45,7 @@ public abstract class Auditable<T> implements Serializable {
     @Column(name = "status", length = 50)
     protected T status;
 
+    @Column(name = "note", length = 1000)
+    protected T note;
+
 }

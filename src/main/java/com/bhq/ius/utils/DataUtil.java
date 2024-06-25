@@ -435,7 +435,19 @@ public class DataUtil {
 
     public static final String encryptPasswordSHA256(String password) {
         return DigestUtils.sha256Hex(password);
+    }
 
+    public static final String convertLocalDateToString(LocalDate date) {
+        try {
+            String year = String.valueOf(date.getYear());
+            String month = String.valueOf(date.getMonthValue());
+            String day = String.valueOf(date.getDayOfMonth());
+            String result = year + month + day;
+            return result;
+        } catch (Exception e) {
+            log.error("==== error replaceSpecialCharacterInBirthday ==== {}", e.getMessage());
+            return date.toString();
+        }
     }
 
 }

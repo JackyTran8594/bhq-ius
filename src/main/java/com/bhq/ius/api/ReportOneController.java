@@ -35,4 +35,16 @@ public class ReportOneController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @PostMapping("/submit-driver")
+    public ResponseEntity<BaseResponseData<?>> submitDriver(@RequestBody List<Long> listId) {
+        BaseResponseData<?> response = service.submitDriver(listId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/submit-course")
+    public ResponseEntity<BaseResponseData<?>> submitCourse(@RequestBody List<Long> listId) {
+        BaseResponseData<?> response = service.submitCourse(listId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 }

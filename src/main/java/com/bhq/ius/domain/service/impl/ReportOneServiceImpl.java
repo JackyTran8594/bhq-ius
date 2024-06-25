@@ -3,6 +3,7 @@ package com.bhq.ius.domain.service.impl;
 import com.bhq.ius.constant.IusConstant;
 import com.bhq.ius.constant.XmlElement;
 import com.bhq.ius.domain.dto.*;
+import com.bhq.ius.domain.dto.common.BaseResponseData;
 import com.bhq.ius.domain.entity.Course;
 import com.bhq.ius.domain.entity.Driver;
 import com.bhq.ius.domain.entity.Profile;
@@ -15,11 +16,13 @@ import com.bhq.ius.domain.repository.DocumentRepository;
 import com.bhq.ius.domain.repository.DriverRepository;
 import com.bhq.ius.domain.repository.ProfileRepository;
 import com.bhq.ius.domain.service.ReportOneService;
+import com.bhq.ius.integration.service.IntegrationUserSerive;
 import com.bhq.ius.utils.DataUtil;
 import com.bhq.ius.utils.XmlUtil;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.w3c.dom.Document;
@@ -48,6 +51,9 @@ public class ReportOneServiceImpl implements ReportOneService {
 
     @Autowired
     private CourseRepository courseRepository;
+
+    @Autowired
+    private IntegrationUserSerive integrationUserSerive;
 
     @Override
     @Transactional
@@ -98,10 +104,33 @@ public class ReportOneServiceImpl implements ReportOneService {
     }
 
     @Override
-    public boolean submitReport(List<Long> listId) {
+    public BaseResponseData<List<Long>> submitDriver(List<Long> listId) {
+        BaseResponseData<List<Long>> responseData = new BaseResponseData<>();
+        try {
+            List<Driver> drivers = driverRepository.findAllById(listId);
+            List<Long> listIdSubmitted = integrationUserSerive.CreateDrivers(drivers);
+            responseData.initData(listIdSubmitted);
+        } catch (Exception exception) {
+            log.error("==== error in submitDriver ==== {}", exception.getMessage());
+            responseData.setError(HttpStatus.INTERNAL_SERVER_ERROR.name());
+            responseData.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+        return responseData;
+    }
 
-
-
+    @Override
+    public BaseResponseData<List<Long>> submitCourse(List<Long> listId) {
+        BaseResponseData<List<Long>> responseData = new BaseResponseData<>();
+        try {
+            List<Course> courses = courseRepository.findAllById(listId);
+            List<Long> listIdSubmitted = integrationUserSerive.CreateCourses(courses);
+            responseData.initData(listIdSubmitted);
+        } catch (Exception exception) {
+            log.error("==== error in submitDriver ==== {}", exception.getMessage());
+            responseData.setError(HttpStatus.INTERNAL_SERVER_ERROR.name());
+            responseData.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+        return responseData;
     }
 
     private void saveIntoDb(DriverXmlDto dto) {
@@ -158,7 +187,7 @@ public class ReportOneServiceImpl implements ReportOneService {
 
                 String ngayCapCMT = XmlUtil.getTagValue("NGAY_CAP_CMT", element);
                 if(!DataUtil.isNullOrEmpty(ngayCapCMT)) {
-                    driverDto.setNgaySinh(DataUtil.convertStringToLocalDate(ngayCapCMT, IusConstant.DATE_FORMAT));
+                    driverDto.setNgayCapCMT(DataUtil.convertStringToLocalDate(ngayCapCMT, IusConstant.DATE_FORMAT));
                 }
 
                 driverDto.setNoiCapCMT(XmlUtil.getTagValue("NOI_CAP_CMT", element));
