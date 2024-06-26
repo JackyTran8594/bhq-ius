@@ -2,25 +2,26 @@ package com.bhq.ius.integration.service;
 
 import com.bhq.ius.constant.IusConstant;
 import com.bhq.ius.constant.RecordStatus;
-import com.bhq.ius.constant.XmlElement;
-import com.bhq.ius.domain.dto.ProfileDto;
 import com.bhq.ius.domain.entity.Course;
 import com.bhq.ius.domain.entity.Driver;
 import com.bhq.ius.domain.repository.CourseRepository;
 import com.bhq.ius.domain.repository.DriverRepository;
 import com.bhq.ius.integration.dto.ExceptionMoodle;
 import com.bhq.ius.integration.dto.MoodleCourse;
-import com.bhq.ius.integration.dto.MoodleCourseCategoriy;
+import com.bhq.ius.integration.dto.MoodleCourseCategory;
 import com.bhq.ius.integration.dto.MoodleUser;
 import com.bhq.ius.utils.DataUtil;
 import com.bhq.ius.utils.XmlUtil;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
@@ -32,7 +33,9 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.*;
 
 @Service
@@ -85,7 +88,7 @@ public class IntegrationUserServiceImpl implements IntegrationUserSerive {
                     mappingToMoodleCourse(course, moodleCourse);
                     try {
                         /* call to moodle backend that getting categories id */
-                        MoodleCourseCategoriy courseCategoriy = getCourseCategoryDetailFromMoodleBackend(IusConstant.COURSE_CATEGORY_IDNUMBER, course.getMaHangDaoTao());
+                        MoodleCourseCategory courseCategoriy = getCourseCategoryDetailFromMoodleBackend(IusConstant.COURSE_CATEGORY_IDNUMBER, course.getMaHangDaoTao());
                         moodleCourse.setCategoryId(courseCategoriy.getId());
                         postCourseToMoodleBackend(moodleCourse);
                         course.setStatus(RecordStatus.SUBMITTED.name());
@@ -127,11 +130,11 @@ public class IntegrationUserServiceImpl implements IntegrationUserSerive {
         course.setFullName(!DataUtil.isNullOrEmpty(item.getMaKhoaHoc()) ? item.getMaKhoaHoc() : null);
         course.setShortName(!DataUtil.isNullOrEmpty(item.getTenKhoaHoc()) ? item.getTenKhoaHoc() : null);
         if (!DataUtil.isNullOrEmpty(item.getNgayKhaiGiang())) {
-            long startDate = item.getNgayKhaiGiang().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+            long startDate = item.getNgayKhaiGiang().toEpochSecond(LocalTime.NOON, ZoneOffset.MIN); ;
             course.setStartDate(startDate);
         }
         if (!DataUtil.isNullOrEmpty(item.getNgayBeGiang())) {
-            long endDate = item.getNgayBeGiang().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+            long endDate = item.getNgayBeGiang().toEpochSecond(LocalTime.NOON, ZoneOffset.MIN);
             course.setEndDate(endDate);
         }
     }
@@ -230,7 +233,7 @@ public class IntegrationUserServiceImpl implements IntegrationUserSerive {
      * @param value: value match it
      * @return
      */
-    private MoodleCourseCategoriy getCourseCategoryDetailFromMoodleBackend(String key, String value) {
+    private MoodleCourseCategory getCourseCategoryDetailFromMoodleBackend(String key, String value) {
         /* setting resttemplate */
         DefaultUriBuilderFactory defaultUriBuilderFactory = new DefaultUriBuilderFactory();
         defaultUriBuilderFactory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.NONE);
@@ -264,8 +267,21 @@ public class IntegrationUserServiceImpl implements IntegrationUserSerive {
             ExceptionMoodle exception = DataUtil.jsonToObject(response.getBody(), ExceptionMoodle.class);
             throw new RuntimeException(exception.getMessage());
         }
-        MoodleCourseCategoriy courseCategoriy = DataUtil.jsonToObject(response.getBody(), MoodleCourseCategoriy.class);
-        return courseCategoriy;
+        List<MoodleCourseCategory> listCategory = convertJsonToList(response.getBody());
+        MoodleCourseCategory moodleCourseCategory = (listCategory.size() > 0) ? listCategory.get(0) : new MoodleCourseCategory();
+        return moodleCourseCategory;
+    }
+
+    private List<MoodleCourseCategory> convertJsonToList(String jsonArray) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            TypeReference<List<MoodleCourseCategory>> jacksonTypeReference = new TypeReference<List<MoodleCourseCategory>>() {};
+            List<MoodleCourseCategory> categoriyList = objectMapper.readValue(jsonArray, jacksonTypeReference);
+            return categoriyList;
+        } catch (JsonProcessingException e) {
+            log.error("=== error in convertJsonToList - MoodleCourseCategory === {}", e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 
     private ExceptionMoodle convertException(String response) {
