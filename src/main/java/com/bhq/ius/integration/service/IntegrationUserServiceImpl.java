@@ -10,6 +10,7 @@ import com.bhq.ius.domain.repository.CourseRepository;
 import com.bhq.ius.domain.repository.DriverRepository;
 import com.bhq.ius.integration.dto.ExceptionMoodle;
 import com.bhq.ius.integration.dto.MoodleCourse;
+import com.bhq.ius.integration.dto.MoodleCourseCategoriy;
 import com.bhq.ius.integration.dto.MoodleUser;
 import com.bhq.ius.utils.DataUtil;
 import com.bhq.ius.utils.XmlUtil;
@@ -84,6 +85,8 @@ public class IntegrationUserServiceImpl implements IntegrationUserSerive {
                     mappingToMoodleCourse(course, moodleCourse);
                     try {
                         /* call to moodle backend that getting categories id */
+                        MoodleCourseCategoriy courseCategoriy = getCourseCategoryDetailFromMoodleBackend(IusConstant.COURSE_CATEGORY_IDNUMBER, course.getMaHangDaoTao());
+                        moodleCourse.setCategoryId(courseCategoriy.getId());
                         postCourseToMoodleBackend(moodleCourse);
                         course.setStatus(RecordStatus.SUBMITTED.name());
                     } catch (Exception exception) {
@@ -222,7 +225,13 @@ public class IntegrationUserServiceImpl implements IntegrationUserSerive {
 
     }
 
-    private int getCourseFromMoodleBackend() {
+    /**
+     * get course category detail from moodle
+     * @param key : column in mdl_course_categories
+     * @param value: value match it
+     * @return
+     */
+    private MoodleCourseCategoriy getCourseCategoryDetailFromMoodleBackend(String key, String value) {
         /* setting resttemplate */
         DefaultUriBuilderFactory defaultUriBuilderFactory = new DefaultUriBuilderFactory();
         defaultUriBuilderFactory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.NONE);
@@ -239,6 +248,9 @@ public class IntegrationUserServiceImpl implements IntegrationUserSerive {
         params.put("wstoken", moodleServiceToken.trim());
         params.put("moodlewsrestformat", "json");
         params.put("wsfunction", "core_course_get_categories");
+        params.put("criteria[0][key]", key);
+        params.put("criteria[0][value]", value);
+
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(moodleServiceUrl.trim());
 
@@ -246,14 +258,15 @@ public class IntegrationUserServiceImpl implements IntegrationUserSerive {
             builder.queryParam(entry.getKey(), entry.getValue());
         }
         log.info("=== uri === {}", builder.toUriString());
-        HttpEntity<String> response = restTemplate.exchange(builder.toUriString(), HttpMethod.GET, entity, String.class, headers);
-        log.info("==== response from moodle backend - create course ==== {}", response);
-        log.info("==== body from response from moodle backend - create course ==== {}", response.getBody());
+        HttpEntity<String> response = restTemplate.exchange(builder.toUriString(), HttpMethod.POST, entity, String.class, headers);
+        log.info("==== response from moodle backend - get course categories ==== {}", response);
+        log.info("==== body from response from moodle backend - get course categories ==== {}", response.getBody());
         if(response.getBody().contains("exception")) {
             ExceptionMoodle exception = DataUtil.jsonToObject(response.getBody(), ExceptionMoodle.class);
             throw new RuntimeException(exception.getMessage());
         }
-        return 0;
+        MoodleCourseCategoriy courseCategoriy = DataUtil.jsonToObject(response.getBody(), MoodleCourseCategoriy.class);
+        return courseCategoriy;
     }
 
     private ExceptionMoodle convertException(String response) {
