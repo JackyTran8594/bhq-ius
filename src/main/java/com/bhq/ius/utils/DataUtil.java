@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
@@ -13,6 +14,8 @@ import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
@@ -244,6 +247,14 @@ public class DataUtil {
         return LocalDateTime.parse(value, formatter);
     }
 
+    public static LocalDate convertStringToLocalDate(String value, String format) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+        if (value == null) {
+            return null;
+        }
+        return LocalDate.parse(value, formatter);
+    }
+
     public static String localDateToString(LocalDate value, String format) {
         if (!notNull(value)) {
             return null;
@@ -407,6 +418,36 @@ public class DataUtil {
         }
 
         throw new IllegalArgumentException("Don't know how to instantiate " + className);
+    }
+
+    public static final String convertDateOfBirthWithFormat(String date) {
+        try {
+            String year = date.substring(0, 4);
+            String month = date.substring(4, 6);
+            String day = date.substring(6, 8);
+            String result = year + "-" + month + "-" + day;
+            return result;
+        } catch (Exception e) {
+            log.error("==== convertDateOfBirthToLocalDate ==== {}", e.getMessage());
+            return date;
+        }
+    }
+
+    public static final String encryptPasswordSHA256(String password) {
+        return DigestUtils.sha256Hex(password);
+    }
+
+    public static final String convertLocalDateToString(LocalDate date) {
+        try {
+            String year = String.valueOf(date.getYear());
+            String month = String.valueOf(date.getMonthValue());
+            String day = String.valueOf(date.getDayOfMonth());
+            String result = year + month + day;
+            return result;
+        } catch (Exception e) {
+            log.error("==== error replaceSpecialCharacterInBirthday ==== {}", e.getMessage());
+            return date.toString();
+        }
     }
 
 }

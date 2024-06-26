@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -18,6 +19,9 @@ public class Course extends Auditable<String> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "uuid")
+    private String uuid;
 
     @Column(name = "SO_CMT", length = 50)
     private String soCMT;
@@ -56,7 +60,7 @@ public class Course extends Auditable<String> {
     private String soBCI;
 
     @Column(name = "NGAY_BCI")
-    private LocalDateTime ngayBCI;
+    private LocalDate ngayBCI;
 
     @Column(name = "LUU_LUONG")
     private String luuLuong;
@@ -65,21 +69,21 @@ public class Course extends Auditable<String> {
     private String soHocSinh;
 
     @Column(name = "NGAY_KHAI_GIANG")
-    private LocalDateTime ngayKhaiGiang;
+    private LocalDate ngayKhaiGiang;
 
     @Column(name = "NGAY_BE_GIANG")
-    private LocalDateTime maGiayTo;
+    private LocalDate ngayBeGiang;
 
     @Column(name = "SO_QD_KG")
     private String soQDKG;
 
     @Column(name = "NGAY_QD_KG")
-    private LocalDateTime ngayQDKG;
+    private LocalDate ngayQDKG;
 
     @Column(name = "NGAY_SAT_HACH")
-    private LocalDateTime ngaySatHach;
+    private LocalDate ngaySatHach;
 
     @Column(name = "THOI_GIAN_DT")
-    private LocalDateTime thoiGianDT;
+    private String thoiGianDT;
 
 }

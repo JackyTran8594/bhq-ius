@@ -6,6 +6,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Set;
+
 @Getter
 @Setter
 @Entity
@@ -16,6 +20,9 @@ public class Driver extends Auditable<String> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "uuid", unique = true)
+    private String uuid;
 
     @Column(name = "SO_TT", length = 100)
     private String soTT;
@@ -33,7 +40,7 @@ public class Driver extends Auditable<String> {
     private String hoVaTen;
 
     @Column(name = "NGAY_SINH")
-    private String ngaySinh;
+    private LocalDate ngaySinh;
 
     @Column(name = "MA_QUOC_TICH")
     private String maQuocTich;
@@ -63,7 +70,10 @@ public class Driver extends Auditable<String> {
     private String soCMT;
 
     @Column(name = "NGAY_CAP_CMT")
-    private String ngayCapCMT;
+    private LocalDate ngayCapCMT;
+
+    @Column(name = "NOI_CAP_CMT")
+    private String noiCaPCMT;
 
     @Column(name = "GIOI_TINH")
     private String gioiTinh;
@@ -74,8 +84,11 @@ public class Driver extends Auditable<String> {
     @Column(name = "SO_CMND_CU")
     private String soCMTCu;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "profile_id", referencedColumnName = "id")
+    @OneToOne(mappedBy = "driver", cascade = CascadeType.ALL)
     private Profile profile;
+
+    @OneToMany(mappedBy = "driver", cascade = CascadeType.ALL)
+    private Set<Document> document;
+
 
 }
