@@ -73,7 +73,7 @@ public class Driver extends Auditable<String> {
     private LocalDate ngayCapCMT;
 
     @Column(name = "NOI_CAP_CMT")
-    private String noiCAPCMT;
+    private String noiCaPCMT;
 
     @Column(name = "GIOI_TINH")
     private String gioiTinh;
