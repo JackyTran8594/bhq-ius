@@ -126,7 +126,6 @@ public class IntegrationUserServiceImpl implements IntegrationUserSerive {
         course.setIdNumber(!DataUtil.isNullOrEmpty(item.getMaBCI()) ? item.getMaBCI() : null);
         course.setFullName(!DataUtil.isNullOrEmpty(item.getMaKhoaHoc()) ? item.getMaKhoaHoc() : null);
         course.setShortName(!DataUtil.isNullOrEmpty(item.getTenKhoaHoc()) ? item.getTenKhoaHoc() : null);
-        course.setCategory(!DataUtil.isNullOrEmpty(item.getMaHangDaoTao()) ? item.getMaHangDaoTao() : null);
         if (!DataUtil.isNullOrEmpty(item.getNgayKhaiGiang())) {
             long startDate = item.getNgayKhaiGiang().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
             course.setStartDate(startDate);
@@ -204,7 +203,7 @@ public class IntegrationUserServiceImpl implements IntegrationUserSerive {
         params.put("wsfunction", "core_course_create_courses");
         params.put("courses[0][fullname]", data.getFullName());
         params.put("courses[0][shortname]", data.getShortName());
-        params.put("courses[0][categoryid]", data.getCategory());
+        params.put("courses[0][categoryid]", data.getCategoryId().toString());
         params.put("courses[0][idnumber]", data.getIdNumber());
         params.put("courses[0][startdate]", data.getStartDate().toString());
         params.put("courses[0][enddate]", data.getEndDate().toString());
