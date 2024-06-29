@@ -84,6 +84,9 @@ public class Driver extends Auditable<String> {
     @Column(name = "SO_CMND_CU")
     private String soCMTCu;
 
+    @Column(name = "ID_USER_MOODLE")
+    private String idUserMoodle;
+
     @OneToOne(mappedBy = "driver", cascade = CascadeType.ALL)
     private Profile profile;
 

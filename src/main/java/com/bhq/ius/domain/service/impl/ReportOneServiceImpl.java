@@ -57,7 +57,7 @@ public class ReportOneServiceImpl implements ReportOneService {
 
     @Override
     @Transactional
-    public List<DriverDto> uploadFileXml(MultipartFile multipartFile) {
+    public List<DriverDto> uploadFileXml(MultipartFile file) {
         try {
             DriverXmlDto dto = new DriverXmlDto();
             dto.setDriversDto(new ArrayList<>());
@@ -65,7 +65,7 @@ public class ReportOneServiceImpl implements ReportOneService {
             dto.setProfilesDto(new ArrayList<>());
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-            Document document = documentBuilder.parse(new ByteArrayInputStream(multipartFile.getBytes()));
+            Document document = documentBuilder.parse(new ByteArrayInputStream(file.getBytes()));
             document.getDocumentElement().normalize();
             NodeList nodeListDriver = document.getElementsByTagName(XmlElement.NGUOI_LX.name());
             NodeList nodeListCourse = document.getElementsByTagName(XmlElement.KHOA_HOC.name());
