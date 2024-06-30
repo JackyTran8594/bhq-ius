@@ -1,5 +1,6 @@
 package com.bhq.ius.domain.entity;
 
+import com.bhq.ius.constant.RecordState;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -116,6 +117,13 @@ public class Profile extends Auditable<String> {
 
     @Column(name = "CHON_IN_GPLX")
     private String chonInGPLX;
+
+    @Column(name = "STATE")
+    @Enumerated(EnumType.STRING)
+    private RecordState state;
+
+    @Column(name = "ERROR", length = 1000)
+    private String error;
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "driver_uuid", referencedColumnName = "uuid")

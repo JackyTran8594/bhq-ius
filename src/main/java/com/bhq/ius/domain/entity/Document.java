@@ -1,5 +1,6 @@
 package com.bhq.ius.domain.entity;
 
+import com.bhq.ius.constant.RecordState;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,6 +32,13 @@ public class Document extends Auditable<String> {
 
     @Column(name = "TEN_GIAY_TO", columnDefinition = "NVARCHAR(500)")
     private String tenGiayTo;
+
+    @Column(name = "STATE")
+    @Enumerated(EnumType.STRING)
+    private RecordState state;
+
+    @Column(name = "ERROR", length = 1000)
+    private String error;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "driver_uuid", referencedColumnName = "uuid")

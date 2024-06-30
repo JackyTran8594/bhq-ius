@@ -61,29 +61,29 @@ public class GenericSpecification<T> implements Specification<T> {
         Object strToSearch = searchCriteria.getValue();
         switch (Objects.requireNonNull(SearchOperation.getSimpleOperation(searchCriteria.getOperation()))) {
             case CONTAINS:
-                return criteriaBuilder.like(criteriaBuilder.lower(root.get(searchCriteria.getKey())), "%" + strToSearch.toString().toLowerCase() + "%");
+                return criteriaBuilder.like(criteriaBuilder.lower(root.get(searchCriteria.getKey())), "%" + strToSearch.toString().trim() + "%");
             case DOES_NOT_CONTAIN:
-                return criteriaBuilder.notLike(criteriaBuilder.lower(root.get(searchCriteria.getKey())), "%" + strToSearch.toString().toLowerCase() + "%");
+                return criteriaBuilder.notLike(criteriaBuilder.lower(root.get(searchCriteria.getKey())), "%" + strToSearch.toString().trim() + "%");
 
             case BEGINS_WITH:
 
-                return criteriaBuilder.like(criteriaBuilder.lower(root.get(searchCriteria.getKey())), strToSearch.toString().toLowerCase() + "%");
+                return criteriaBuilder.like(criteriaBuilder.lower(root.get(searchCriteria.getKey())), strToSearch.toString().trim().toLowerCase() + "%");
             case DOES_NOT_BEGIN_WITH:
-                return criteriaBuilder.notLike(criteriaBuilder.lower(root.get(searchCriteria.getKey())), strToSearch.toString().toLowerCase() + "%");
+                return criteriaBuilder.notLike(criteriaBuilder.lower(root.get(searchCriteria.getKey())), strToSearch.toString().trim().toLowerCase() + "%");
             case ENDS_WITH:
-                return criteriaBuilder.like(criteriaBuilder.lower(root.get(searchCriteria.getKey())), "%" + strToSearch.toString().toLowerCase());
+                return criteriaBuilder.like(criteriaBuilder.lower(root.get(searchCriteria.getKey())), "%" + strToSearch.toString().trim());
             case DOES_NOT_END_WITH:
-                return criteriaBuilder.notLike(criteriaBuilder.lower(root.get(searchCriteria.getKey())), "%" + strToSearch.toString().toLowerCase());
+                return criteriaBuilder.notLike(criteriaBuilder.lower(root.get(searchCriteria.getKey())), "%" + strToSearch.toString().trim());
             case EQUAL:
                 if (strToSearch instanceof String) {
-                    return criteriaBuilder.equal(criteriaBuilder.lower(root.<String>get(searchCriteria.getKey())), strToSearch.toString().toLowerCase());
+                    return criteriaBuilder.equal(criteriaBuilder.lower(root.<String>get(searchCriteria.getKey())), strToSearch.toString().trim());
                 } else {
                     return criteriaBuilder.equal(root.<Object>get(searchCriteria.getKey()), strToSearch);
                 }
 
             case NOT_EQUAL:
                 if (strToSearch instanceof String) {
-                    return criteriaBuilder.notEqual(criteriaBuilder.lower(root.get(searchCriteria.getKey())), strToSearch.toString().toLowerCase());
+                    return criteriaBuilder.notEqual(criteriaBuilder.lower(root.get(searchCriteria.getKey())), strToSearch.toString().trim());
                 } else {
                     return criteriaBuilder.notEqual(root.<Object>get(searchCriteria.getKey()), strToSearch);
                 }
@@ -92,15 +92,15 @@ public class GenericSpecification<T> implements Specification<T> {
             case NOT_NULL:
                 return criteriaBuilder.isNotNull(criteriaBuilder.lower(root.get(searchCriteria.getKey())));
             case GREATER_THAN:
-                return criteriaBuilder.greaterThan(criteriaBuilder.lower(root.get(searchCriteria.getKey())), strToSearch.toString().toLowerCase());
+                return criteriaBuilder.greaterThan(criteriaBuilder.lower(root.get(searchCriteria.getKey())), strToSearch.toString().trim());
 
             case GREATER_THAN_EQUAL:
-                return criteriaBuilder.greaterThanOrEqualTo(root.<String>get(searchCriteria.getKey()), searchCriteria.getValue().toString());
+                return criteriaBuilder.greaterThanOrEqualTo(root.<String>get(searchCriteria.getKey()), searchCriteria.getValue().toString().trim());
             case LESS_THAN:
-                return criteriaBuilder.lessThan(root.<String>get(searchCriteria.getKey()), searchCriteria.getValue().toString());
+                return criteriaBuilder.lessThan(root.<String>get(searchCriteria.getKey()), searchCriteria.getValue().toString().trim());
             case LESS_THAN_EQUAL:
 
-                return criteriaBuilder.lessThanOrEqualTo(root.<String>get(searchCriteria.getKey()), searchCriteria.getValue().toString());
+                return criteriaBuilder.lessThanOrEqualTo(root.<String>get(searchCriteria.getKey()), searchCriteria.getValue().toString().trim());
         }
         return null;
     }
@@ -116,11 +116,15 @@ public class GenericSpecification<T> implements Specification<T> {
         Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
             Field field = fields[i];
-            if (fieldName.equals(field.getName())) {
-                String[] str = field.getType().getTypeName().split(Pattern.quote("."));
-                // str[2] = dataType
-                dataType = str[2];
-                break;
+            if(field.getType().equals(Enum.class)) {
+                dataType = "String";
+            } else {
+                if (fieldName.equals(field.getName())) {
+                    String[] str = field.getType().getTypeName().split(Pattern.quote("."));
+                    // str[2] = dataType
+                    dataType = str[2];
+                    break;
+                }
             }
         }
         return dataType;

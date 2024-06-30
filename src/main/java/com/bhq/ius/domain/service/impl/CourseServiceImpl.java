@@ -1,11 +1,14 @@
 package com.bhq.ius.domain.service.impl;
 
+import com.bhq.ius.constant.RecordState;
+import com.bhq.ius.constant.RecordStatus;
 import com.bhq.ius.domain.dto.CourseDto;
 import com.bhq.ius.domain.entity.Course;
 import com.bhq.ius.domain.repository.CourseRepository;
 import com.bhq.ius.domain.service.CourseService;
 import com.bhq.ius.domain.specification.GenericSpecificationBuilder;
 import com.bhq.ius.domain.specification.criteria.SearchCriteria;
+import com.bhq.ius.domain.specification.criteria.SearchOperation;
 import com.bhq.ius.utils.DataUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -37,6 +40,9 @@ public class CourseServiceImpl implements CourseService {
                 builder.with(new SearchCriteria(matcher.group(1), matcher.group(3), matcher.group(6)));
             }
         }
+        /* default search with status not submitted*/
+        builder.with(new SearchCriteria("state", SearchOperation.NOT_EQUAL.getName(), RecordState.SUBMITTED));
+        builder.with(new SearchCriteria("state", SearchOperation.NUL.getName(),""));
         // specification
         builder.setClazz(Course.class);
         Specification<Course> spec = builder.build();
