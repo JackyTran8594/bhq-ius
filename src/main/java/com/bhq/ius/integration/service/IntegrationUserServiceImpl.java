@@ -1,7 +1,7 @@
 package com.bhq.ius.integration.service;
 
 import com.bhq.ius.constant.IusConstant;
-import com.bhq.ius.constant.RecordStatus;
+import com.bhq.ius.constant.RecordState;
 import com.bhq.ius.domain.entity.Course;
 import com.bhq.ius.domain.entity.Driver;
 import com.bhq.ius.domain.repository.CourseRepository;
@@ -12,7 +12,6 @@ import com.bhq.ius.integration.dto.MoodleCourseCategory;
 import com.bhq.ius.integration.dto.MoodleUser;
 import com.bhq.ius.utils.DataUtil;
 import com.bhq.ius.utils.XmlUtil;
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -64,16 +63,16 @@ public class IntegrationUserServiceImpl implements IntegrationUserSerive {
                     mappingToMoodleUser(driver, user);
                     try {
                         postUserToMoodleBackend(user);
-                        driver.setStatus(RecordStatus.SUBMITTED.name());
+                        driver.setState(RecordState.SUBMITTED);
                     } catch (Exception exception) {
                         log.error("=== error in postUserToMoodleBackend === {}", exception.getMessage());
-                        driver.setStatus(RecordStatus.FAILED.name());
-                        driver.setNote(exception.getMessage());
+                        driver.setState(RecordState.FAILED);
+                        driver.setError(exception.getMessage());
                     }
                     driverRepository.save(driver);
                 }
             }
-            listIdSubmitted = listDriver.stream().filter(x -> RecordStatus.SUBMITTED.name().equals(x.getStatus())).map(y -> y.getId()).toList();
+            listIdSubmitted = listDriver.stream().filter(x -> RecordState.SUBMITTED.name().equals(x.getStatus())).map(y -> y.getId()).toList();
         }
         return listIdSubmitted;
     }
@@ -91,16 +90,16 @@ public class IntegrationUserServiceImpl implements IntegrationUserSerive {
                         MoodleCourseCategory courseCategoriy = getCourseCategoryDetailFromMoodleBackend(IusConstant.COURSE_CATEGORY_IDNUMBER, course.getMaHangDaoTao());
                         moodleCourse.setCategoryId(courseCategoriy.getId());
                         postCourseToMoodleBackend(moodleCourse);
-                        course.setStatus(RecordStatus.SUBMITTED.name());
+                        course.setState(RecordState.SUBMITTED);
                     } catch (Exception exception) {
                         log.error("=== error in postUserToMoodleBackend === {}", exception.getMessage());
-                        course.setStatus(RecordStatus.FAILED.name());
-                        course.setNote(exception.getMessage());
+                        course.setState(RecordState.FAILED);
+                        course.setError(exception.getMessage());
                     }
                     courseRepository.save(course);
                 }
             }
-            listIdSubmitted = listCourse.stream().filter(x -> RecordStatus.SUBMITTED.name().equals(x.getStatus())).map(y -> y.getId()).toList();
+            listIdSubmitted = listCourse.stream().filter(x -> RecordState.SUBMITTED.name().equals(x.getStatus())).map(y -> y.getId()).toList();
         }
         return listIdSubmitted;
     }

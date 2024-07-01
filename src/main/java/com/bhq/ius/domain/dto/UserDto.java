@@ -1,6 +1,7 @@
 package com.bhq.ius.domain.dto;
 
 import com.bhq.ius.domain.dto.common.BaseDto;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,8 +16,10 @@ import java.time.LocalDateTime;
 public class UserDto extends BaseDto<String> {
     private Long id;
 
+    @NotBlank
     private String username;
 
+    @NotBlank
     private String password;
 
     private String fullName;
@@ -26,7 +29,5 @@ public class UserDto extends BaseDto<String> {
     private String email;
 
     private LocalDateTime lastLoginTime;
-
-    private Long roleId;
 
 }

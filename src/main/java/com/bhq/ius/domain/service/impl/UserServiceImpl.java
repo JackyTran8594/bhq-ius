@@ -1,5 +1,6 @@
 package com.bhq.ius.domain.service.impl;
 
+import com.bhq.ius.constant.RecordStatus;
 import com.bhq.ius.domain.dto.UserDto;
 import com.bhq.ius.domain.entity.User;
 import com.bhq.ius.domain.repository.UserRepository;
@@ -13,8 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -51,6 +55,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto create(UserDto dto) {
         User entity = new User();
+        String passwordEncrypt = new BCryptPasswordEncoder().encode(dto.getPassword());
+        dto.setPassword(passwordEncrypt);
+        dto.setStatus(RecordStatus.ACTIVE.name());
         BeanUtils.copyProperties(dto, entity);
         repository.save(entity);
         return dto;
@@ -60,10 +67,22 @@ public class UserServiceImpl implements UserService {
     public UserDto update(UserDto dto) {
         Optional<User> entity = repository.findById(dto.getId());
         if(entity.isPresent()) {
-            BeanUtils.copyProperties(dto, entity);
+            String passwordEncrypt = new BCryptPasswordEncoder().encode(dto.getPassword());
+            dto.setPassword(passwordEncrypt);
+            BeanUtils.copyProperties(dto, entity.get());
             repository.save(entity.get());
         }
         return dto;
+    }
+
+    @Override
+    public void updateLoginTimeByUsername(String username) {
+        User entity = repository.findByUsername(username);
+        if (!DataUtil.isNullOrEmpty(entity)) {
+            entity.setLastLoginTime(LocalDateTime.now());
+            repository.save(entity);
+        }
+
     }
 
     @Override
@@ -81,6 +100,16 @@ public class UserServiceImpl implements UserService {
         UserDto dto = new UserDto();
         Optional<User> entity = repository.findById(id);
         entity.ifPresent(value -> BeanUtils.copyProperties(value, dto));
+        return dto;
+    }
+
+    @Override
+    public UserDto findByUsername(String username) {
+        UserDto dto = new UserDto();
+        User entity = repository.findByUsername(username);
+        if(!DataUtil.isNullOrEmpty(entity)) {
+            BeanUtils.copyProperties(entity, dto);
+        }
         return dto;
     }
 }

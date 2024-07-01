@@ -5,7 +5,10 @@ server:
 app:
   jwtSecret: test
   tokenValidity: 28600
-
+  adminUser: adminbhq
+  moodleService:
+    url: https://daotao.bhq.vn/moodle/webservice/rest/server.php
+    token: ed10bf82b15919211e501da908de9857
 spring:
   application:
     name: bhq-ius

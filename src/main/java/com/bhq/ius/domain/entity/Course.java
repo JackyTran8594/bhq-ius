@@ -1,5 +1,6 @@
 package com.bhq.ius.domain.entity;
 
+import com.bhq.ius.constant.RecordState;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -85,5 +86,12 @@ public class Course extends Auditable<String> {
 
     @Column(name = "THOI_GIAN_DT")
     private String thoiGianDT;
+
+    @Column(name = "STATE")
+    @Enumerated(EnumType.STRING)
+    private RecordState state;
+
+    @Column(name = "ERROR", length = 1000)
+    private String error;
 
 }

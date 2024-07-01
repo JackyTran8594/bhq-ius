@@ -11,9 +11,11 @@ public interface UserService {
     Page<UserDto> findBySearchParam(Optional<String> search, Pageable page);
     UserDto create(UserDto dto);
     UserDto update(UserDto dto);
+    void updateLoginTimeByUsername(String username);
     void deleteById(Long id);
     void deleteByListId(List<Long> listId);
     UserDto findById(Long id);
+    UserDto findByUsername(String username);
 
 
 }

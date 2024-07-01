@@ -3,6 +3,7 @@ package com.bhq.ius.domain.dto.common;
 import lombok.Data;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 
 import java.time.LocalDateTime;
 
@@ -27,5 +28,15 @@ public class BaseResponseData<T> {
     public void initData(T data) {
         this.data = data;
         this.success();
+    }
+
+    public BaseResponseData(HttpStatusCode httpStatusCode, String errorMessage) {
+        this.status = httpStatusCode.value();
+        this.error = errorMessage;
+    }
+
+    public void error(HttpStatus httpStatus, String errorMessage) {
+        this.status = httpStatus.value();
+        this.error = errorMessage;
     }
 }
