@@ -13,7 +13,7 @@ spring:
   application:
     name: bhq-ius
   datasource:
-    url: jdbc:mysql://203.162.89.200:8806/ius
+    url: jdbc:mysql://10.15.200.30/:8806/ius
     username: bhqadmin
     password: Nsi@ansv1234
     driver-class-name: com.mysql.cj.jdbc.Driver
