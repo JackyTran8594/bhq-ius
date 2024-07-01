@@ -14,9 +14,9 @@
 
 
 ### STAGE 2: DEPLOY APPLICATION
-FROM amazoncorretto:17.0.8-alpine
-COPY /deploy/bhq-ius-0.0.1.jar /app/
+FROM amazoncorretto:8-al2023
 WORKDIR /app
+COPY deploy/bhq-ius-0.0.1.jar /app/
 RUN ls -la
 ENTRYPOINT ["java","-jar", "bhq-ius-0.0.1.jar"]
 
