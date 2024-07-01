@@ -14,7 +14,7 @@ RUN mvn clean install -Pprod
 
 
 ### STAGE 2: DEPLOY APPLICATION
-FROM amazoncorretto:8-al2023
+FROM amazoncorretto:17.0.8-alpine
 WORKDIR /app
 COPY --from=builders /app/target/bhq-ius-0.0.1.jar /app/
 RUN ls -la
