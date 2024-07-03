@@ -108,10 +108,10 @@ public class IntegrationUserServiceImpl implements IntegrationUserSerive {
         user.setUsername(!DataUtil.isNullOrEmpty(driver.getMaDK()) ? driver.getMaDK() : null);
         user.setFirstName(!DataUtil.isNullOrEmpty(driver.getHoTenDem()) ? driver.getHoTenDem() : null);
         user.setLastName(!DataUtil.isNullOrEmpty(driver.getTen()) ? driver.getTen() : null);
-        user.setIdNumber(!DataUtil.isNullOrEmpty(driver.getMaDK()) ? driver.getMaDK() : null);
+        user.setIdNumber(!DataUtil.isNullOrEmpty(driver.getSoCMT()) ? driver.getSoCMT() : null);
         String email = driver.getMaDK() + IusConstant.EMAIL_PARTERN;
         user.setEmail(!DataUtil.isNullOrEmpty(email) ? email : UUID.randomUUID() + IusConstant.EMAIL_PARTERN);
-        user.setPassword(!DataUtil.isNullOrEmpty(driver.getNgaySinh()) ? DataUtil.convertLocalDateToString(driver.getNgaySinh()) : null);
+        user.setPassword(!DataUtil.isNullOrEmpty(driver.getNgaySinh()) ? driver.getNgaySinh() : null);
     }
 
     private List<MoodleUser> mappingToListMoodleUser(List<Driver> listDriver) {
