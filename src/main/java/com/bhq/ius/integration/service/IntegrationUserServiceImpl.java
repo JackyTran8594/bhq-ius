@@ -111,7 +111,7 @@ public class IntegrationUserServiceImpl implements IntegrationUserSerive {
         user.setIdNumber(!DataUtil.isNullOrEmpty(driver.getSoCMT()) ? driver.getSoCMT() : null);
         String email = driver.getMaDK() + IusConstant.EMAIL_PARTERN;
         user.setEmail(!DataUtil.isNullOrEmpty(email) ? email : UUID.randomUUID() + IusConstant.EMAIL_PARTERN);
-        user.setPassword(!DataUtil.isNullOrEmpty(driver.getNgaySinh()) ? driver.getNgaySinh() : null);
+        user.setPassword(!DataUtil.isNullOrEmpty(driver.getNgaySinh()) ? DataUtil.convertLocalDateToString(driver.getNgaySinh()) : null);
     }
 
     private List<MoodleUser> mappingToListMoodleUser(List<Driver> listDriver) {

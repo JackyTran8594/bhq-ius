@@ -440,8 +440,18 @@ public class DataUtil {
     public static final String convertLocalDateToString(LocalDate date) {
         try {
             String year = String.valueOf(date.getYear());
-            String month = String.valueOf(date.getMonthValue());
-            String day = String.valueOf(date.getDayOfMonth());
+            String month = "";
+            String day = "";
+            if (date.getMonthValue() <= 9) {
+                month = "0" + date.getMonthValue();
+            } else {
+                month = String.valueOf(date.getMonthValue());
+            }
+            if (date.getDayOfMonth() <= 9) {
+                day = "0" + date.getDayOfMonth();
+            } else {
+                day = String.valueOf(date.getDayOfMonth());
+            }
             String result = year + month + day;
             return result;
         } catch (Exception e) {

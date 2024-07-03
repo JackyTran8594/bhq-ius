@@ -41,7 +41,7 @@ public class Driver extends Auditable<String> {
     private String hoVaTen;
 
     @Column(name = "NGAY_SINH")
-    private String ngaySinh;
+    private LocalDate ngaySinh;
 
     @Column(name = "MA_QUOC_TICH")
     private String maQuocTich;

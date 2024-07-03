@@ -34,4 +34,13 @@ class DataUtilTest {
         System.out.println("==== date ===== " + dataUtil.convertStringToLocalDate(date, "yyyy-MM-dd"));
         assertEquals(result, dataUtil.convertStringToLocalDate(date, "yyyy-MM-dd"));
     }
+
+    @Test
+    void convertLocalDateToString() {
+        LocalDate date = LocalDate.of(1983,03,27);
+        String expect = "19830327";
+        System.out.println("==== date ===== " + dataUtil.convertLocalDateToString(date));
+        assertEquals(expect, dataUtil.convertLocalDateToString(date));
+
+    }
 }
