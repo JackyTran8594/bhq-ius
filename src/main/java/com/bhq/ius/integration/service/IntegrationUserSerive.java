@@ -9,4 +9,5 @@ import java.util.List;
 public interface IntegrationUserSerive {
     List<Long> CreateDrivers(List<Driver> listDriver);
     List<Long> CreateCourses(List<Course> listCourse);
+    List<Long> UpdateUserPicture(List<String> username);
 }
