@@ -13,8 +13,8 @@ public interface MoodleService {
     MoodleUserResponse postUserToMoodleBackend(MoodleUser user);
     void postCourseToMoodleBackend(MoodleCourse data);
     MoodleCourseCategory getCourseCategoryDetailFromMoodleBackend(String key, String value);
-    MoodleUploadFile uploadFileInMoodelWithDedicatedEndpoint(ByteArrayResource contentsAsResource, String fileName , String tokenForUser, Long userId);
+    MoodleUploadFile uploadFileInMoodelWithDedicatedEndpoint(ByteArrayResource contentsAsResource, String fileName , String tokenForUser, String userId);
     MoodleTokenMobile getTokenUserFromMoodle(String username, String password);
-    void updateUserPicture(String token, String draftItemId, Long userId);
+    void updateUserPicture(String token, String draftItemId, String userId);
 
 }

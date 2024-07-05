@@ -63,7 +63,7 @@ public class IntegrationUserServiceImpl implements IntegrationUserSerive {
                     try {
                         MoodleUserResponse userResponse = moodleService.postUserToMoodleBackend(user);
                         driver.setState(RecordState.SUBMITTED);
-                        driver.setIdUserMoodle(userResponse.getId());
+                        driver.setIdUserMoodle(userResponse.getId().toString());
                     } catch (Exception exception) {
                         log.error("=== error in postUserToMoodleBackend === {}", exception.getMessage());
                         driver.setState(RecordState.FAILED);

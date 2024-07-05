@@ -162,7 +162,7 @@ public class MoodleServiceImpl implements MoodleService {
     }
 
     @Override
-    public MoodleUploadFile uploadFileInMoodelWithDedicatedEndpoint(ByteArrayResource contentsAsResource, String fileName , String tokenForUser, Long userId) {
+    public MoodleUploadFile uploadFileInMoodelWithDedicatedEndpoint(ByteArrayResource contentsAsResource, String fileName , String tokenForUser, String userId) {
         RestTemplate restTemplate = buildingDefaultResTemplate();
         HttpHeaders  headers = buildingDefaultHeaders();
         HttpEntity<String> entity = new HttpEntity<>(headers);
@@ -227,7 +227,7 @@ public class MoodleServiceImpl implements MoodleService {
     }
 
     @Override
-    public void updateUserPicture(String token, String draftItemId, Long userId) {
+    public void updateUserPicture(String token, String draftItemId, String userId) {
         /* setting resttemplate */
         RestTemplate restTemplate = buildingDefaultResTemplate();
         /* setting headers */
@@ -240,7 +240,7 @@ public class MoodleServiceImpl implements MoodleService {
         params.put("moodlewsrestformat", "json");
         params.put("wsfunction", "core_user_update_picture");
         params.put("draftitemid", draftItemId);
-        params.put("userid", userId.toString());
+        params.put("userid", userId);
 
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(moodleServiceUrl.trim());
