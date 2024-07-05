@@ -50,4 +50,10 @@ public class ReportOneController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @PostMapping("/submit-avatar")
+    public ResponseEntity<BaseResponseData<?>> submitAvatar(@RequestBody List<Long> listId) {
+        BaseResponseData<?> response = service.submitAvatar(listId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 }

@@ -4,12 +4,11 @@ import com.bhq.ius.constant.IusConstant;
 import com.bhq.ius.constant.RecordState;
 import com.bhq.ius.domain.entity.Course;
 import com.bhq.ius.domain.entity.Driver;
+import com.bhq.ius.domain.entity.Profile;
 import com.bhq.ius.domain.repository.CourseRepository;
 import com.bhq.ius.domain.repository.DriverRepository;
-import com.bhq.ius.integration.dto.ExceptionMoodle;
-import com.bhq.ius.integration.dto.MoodleCourse;
-import com.bhq.ius.integration.dto.MoodleCourseCategory;
-import com.bhq.ius.integration.dto.MoodleUser;
+import com.bhq.ius.domain.repository.ProfileRepository;
+import com.bhq.ius.integration.dto.*;
 import com.bhq.ius.utils.DataUtil;
 import com.bhq.ius.utils.XmlUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -18,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -40,6 +40,8 @@ import java.util.*;
 @Service
 @Slf4j
 public class IntegrationUserServiceImpl implements IntegrationUserSerive {
+    @Autowired
+    private ProfileRepository profileRepository;
 
     @Autowired
     private DriverRepository driverRepository;
@@ -102,8 +104,30 @@ public class IntegrationUserServiceImpl implements IntegrationUserSerive {
     }
 
     @Override
-    public List<Long> UpdateUserPicture(List<String> username) {
-        return null;
+    public List<Long> UpdateUserPicture(List<Driver> listDriver) {
+        List<Long> result = new ArrayList<>();
+        if (listDriver.size() > 0) {
+            for (Driver item : listDriver) {
+                Profile profile = item.getProfile();
+                try {
+                    /* get token */
+                    MoodleTokenMobile token = moodleService.getTokenUserFromMoodle(item.getMaDK(), DataUtil.convertLocalDateToString(item.getNgaySinh()));
+                    /* upload file */
+                    ByteArrayResource resource = new ByteArrayResource(profile.getImageFile());
+                    MoodleUploadFile uploadFile = moodleService.uploadFileInMoodelWithDedicatedEndpoint(resource, resource.getFilename(), token.getToken(), item.getIdUserMoodle());
+                    /* update picture */
+                    moodleService.updateUserPicture(token.getToken(), uploadFile.getItemId(), item.getIdUserMoodle());
+                    profile.setState(RecordState.SUBMITTED);
+                } catch (Exception exception) {
+                    log.error("=== error in UpdateUserPicture === {}", exception.getMessage());
+                    profile.setState(RecordState.FAILED);
+                    profile.setError(exception.getMessage());
+                }
+                profileRepository.save(profile);
+                result.add(profile.getId());
+            }
+        }
+        return result;
     }
 
     /* Utils function */
@@ -132,7 +156,8 @@ public class IntegrationUserServiceImpl implements IntegrationUserSerive {
         course.setFullName(!DataUtil.isNullOrEmpty(item.getMaKhoaHoc()) ? item.getMaKhoaHoc() : null);
         course.setShortName(!DataUtil.isNullOrEmpty(item.getTenKhoaHoc()) ? item.getTenKhoaHoc() : null);
         if (!DataUtil.isNullOrEmpty(item.getNgayKhaiGiang())) {
-            long startDate = item.getNgayKhaiGiang().toEpochSecond(LocalTime.NOON, ZoneOffset.MIN); ;
+            long startDate = item.getNgayKhaiGiang().toEpochSecond(LocalTime.NOON, ZoneOffset.MIN);
+            ;
             course.setStartDate(startDate);
         }
         if (!DataUtil.isNullOrEmpty(item.getNgayBeGiang())) {
@@ -151,8 +176,6 @@ public class IntegrationUserServiceImpl implements IntegrationUserSerive {
         return result;
     }
     /* End */
-
-
 
 
 }

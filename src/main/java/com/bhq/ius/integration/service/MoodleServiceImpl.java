@@ -1,21 +1,20 @@
 package com.bhq.ius.integration.service;
 
 import com.bhq.ius.domain.entity.Profile;
-import com.bhq.ius.integration.dto.ExceptionMoodle;
-import com.bhq.ius.integration.dto.MoodleCourse;
-import com.bhq.ius.integration.dto.MoodleCourseCategory;
-import com.bhq.ius.integration.dto.MoodleUser;
+import com.bhq.ius.integration.dto.*;
 import com.bhq.ius.utils.DataUtil;
 import com.bhq.ius.utils.XmlUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.MultiValuedMap;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -25,6 +24,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -44,6 +44,9 @@ public class MoodleServiceImpl implements MoodleService {
 
     @Value("${app.moodleService.token}")
     private String moodleServiceToken;
+
+    @Value("${app.moodleService.login-endpoint}")
+    private String moodleServiceLoginEndpoint;
     @Override
     public void postUserToMoodleBackend(MoodleUser user) {
         /* setting resttemplate */
@@ -150,24 +153,106 @@ public class MoodleServiceImpl implements MoodleService {
             ExceptionMoodle exception = DataUtil.jsonToObject(response.getBody(), ExceptionMoodle.class);
             throw new RuntimeException(exception.getMessage());
         }
-        List<MoodleCourseCategory> listCategory = convertJsonToList(response.getBody());
+        List<MoodleCourseCategory> listCategory = convertJsonToListCourse(response.getBody());
         MoodleCourseCategory moodleCourseCategory = (listCategory.size() > 0) ? listCategory.get(0) : new MoodleCourseCategory();
         return moodleCourseCategory;
     }
 
     @Override
-    public String uploadFileInMoodelWithDedicatedEndpoint(Profile profile, String tokenForUser) {
-        return null;
+    public MoodleUploadFile uploadFileInMoodelWithDedicatedEndpoint(ByteArrayResource contentsAsResource, String fileName , String tokenForUser, String userId) {
+        RestTemplate restTemplate = buildingDefaultResTemplate();
+        HttpHeaders  headers = buildingDefaultHeaders();
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        /* keeping param with order by linkedHashMap */
+        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+        params.add("token", tokenForUser);
+        params.add("component", "user");
+        params.add("userid", userId);
+        params.add("filearea", "draft");
+        params.add("filename", fileName);
+        params.add("filepath", "/");
+        params.add("licence", "allrightsreserved");
+        params.add("author", "");
+        params.add("source", "");
+        params.add("file_1", contentsAsResource);
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity
+                = new HttpEntity<>(params, headers);
+
+        ResponseEntity<String> response = restTemplate
+                .postForEntity(moodleServiceDedicatedEnpointUrl, requestEntity, String.class);
+        log.info("==== response from moodle backend - upload file to moodle ==== {}", response);
+        log.info("==== body from response from moodle backend - upload file to moodle ==== {}", response.getBody());
+        if(response.getBody().contains("exception")) {
+            ExceptionMoodle exception = DataUtil.jsonToObject(response.getBody(), ExceptionMoodle.class);
+            throw new RuntimeException(exception.getMessage());
+        }
+        List<MoodleUploadFile> result = convertJsonToListUploadFile(response.getBody());
+        MoodleUploadFile uploadFile = (result.size() > 0) ? result.get(0) : new MoodleUploadFile();
+        return uploadFile;
     }
 
     @Override
-    public String getTokenUserFromMoodle(String username, String password) {
-        return null;
+    public MoodleTokenMobile getTokenUserFromMoodle(String username, String password) {
+        RestTemplate restTemplate = buildingDefaultResTemplate();
+        HttpHeaders  headers = buildingDefaultHeaders();
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        /* keeping param with order by linkedHashMap */
+        LinkedHashMap<String, String> params = new LinkedHashMap<>();
+        params.put("username", username);
+        params.put("password", password);
+
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(moodleServiceLoginEndpoint.trim());
+
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            builder.queryParam(entry.getKey(), entry.getValue());
+        }
+        log.info("=== uri === {}", builder.toUriString());
+        HttpEntity<String> response = restTemplate.exchange(builder.toUriString(), HttpMethod.POST, entity, String.class, headers);
+        log.info("==== response from moodle backend - get token user ==== {}", response);
+        log.info("==== body from response from moodle backend - get token user ==== {}", response.getBody());
+        if(response.getBody().contains("exception")) {
+            ExceptionMoodle exception = DataUtil.jsonToObject(response.getBody(), ExceptionMoodle.class);
+            throw new RuntimeException(exception.getMessage());
+        }
+        MoodleTokenMobile token = DataUtil.jsonToObject(response.getBody(), MoodleTokenMobile.class);
+        return token;
     }
 
     @Override
-    public void updateUserPicture(String token, String draftItemId) {
+    public void updateUserPicture(String token, String draftItemId, String userId) {
+        /* setting resttemplate */
+        RestTemplate restTemplate = buildingDefaultResTemplate();
+        /* setting headers */
+        HttpHeaders headers = buildingDefaultHeaders();
+        HttpEntity<?> entity = new HttpEntity<>(headers);
 
+        /* keeping param with order by linkedHashMap */
+        LinkedHashMap<String, String> params = new LinkedHashMap<>();
+        params.put("wstoken", token);
+        params.put("moodlewsrestformat", "json");
+        params.put("wsfunction", "core_user_update_picture");
+        params.put("draftitemid", draftItemId);
+        params.put("userid", userId);
+
+
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(moodleServiceUrl.trim());
+
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            builder.queryParam(entry.getKey(), entry.getValue());
+        }
+        log.info("=== uri === {}", builder.toUriString());
+        HttpEntity<String> response = restTemplate.exchange(builder.toUriString(), HttpMethod.POST, entity, String.class, headers);
+        log.info("==== response from moodle backend - update user picture ==== {}", response);
+        log.info("==== body from response from moodle backend - update user picture ==== {}", response.getBody());
+        if(response.getBody().contains("exception")) {
+            ExceptionMoodle exception = DataUtil.jsonToObject(response.getBody(), ExceptionMoodle.class);
+            throw new RuntimeException(exception.getMessage());
+        }
     }
 
     /* Utils function*/
@@ -187,7 +272,7 @@ public class MoodleServiceImpl implements MoodleService {
         HttpEntity<?> entity = new HttpEntity<>(headers);
         return headers;
     }
-    private List<MoodleCourseCategory> convertJsonToList(String jsonArray) {
+    private List<MoodleCourseCategory> convertJsonToListCourse(String jsonArray) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             TypeReference<List<MoodleCourseCategory>> jacksonTypeReference = new TypeReference<List<MoodleCourseCategory>>() {};
@@ -195,6 +280,18 @@ public class MoodleServiceImpl implements MoodleService {
             return categoriyList;
         } catch (JsonProcessingException e) {
             log.error("=== error in convertJsonToList - MoodleCourseCategory === {}", e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    private List<MoodleUploadFile> convertJsonToListUploadFile(String jsonArray) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            TypeReference<List<MoodleUploadFile>> jacksonTypeReference = new TypeReference<List<MoodleUploadFile>>() {};
+            List<MoodleUploadFile> result = objectMapper.readValue(jsonArray, jacksonTypeReference);
+            return result;
+        } catch (JsonProcessingException e) {
+            log.error("=== error in convertJsonToList - MoodleUploadFile === {}", e.getMessage());
             throw new RuntimeException(e);
         }
     }

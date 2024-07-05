@@ -133,6 +133,21 @@ public class ReportOneServiceImpl implements ReportOneService {
         return responseData;
     }
 
+    @Override
+    public BaseResponseData<List<Long>> submitAvatar(List<Long> listId) {
+        BaseResponseData<List<Long>> responseData = new BaseResponseData<>();
+        try {
+            List<Driver> listDriver = driverRepository.findAllById(listId);
+            List<Long> listIdSubmitted = integrationUserSerive.UpdateUserPicture(listDriver);
+            responseData.initData(listIdSubmitted);
+        } catch (Exception exception) {
+            log.error("==== error in submitDriver ==== {}", exception.getMessage());
+            responseData.setError(HttpStatus.INTERNAL_SERVER_ERROR.name());
+            responseData.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+        return responseData;
+    }
+
     private void saveIntoDb(DriverXmlDto dto) {
 
         Course course = CourseMapper.INSTANCE.toEntity(dto.getCourseDto());
