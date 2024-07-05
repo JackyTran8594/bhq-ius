@@ -14,7 +14,6 @@ public interface ReportOneService {
     List<DriverDto> uploadFileXml(MultipartFile file);
     BaseResponseData<List<Long>> submitDriver(List<Long> listId);
     BaseResponseData<List<Long>> submitCourse(List<Long> listId);
-
     BaseResponseData<List<Long>> submitAvatar(List<Long> listId);
 
 }

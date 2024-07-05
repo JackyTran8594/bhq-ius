@@ -48,7 +48,7 @@ public class MoodleServiceImpl implements MoodleService {
     @Value("${app.moodleService.login-endpoint}")
     private String moodleServiceLoginEndpoint;
     @Override
-    public void postUserToMoodleBackend(MoodleUser user) {
+    public MoodleUserResponse postUserToMoodleBackend(MoodleUser user) {
         /* setting resttemplate */
         RestTemplate restTemplate = buildingDefaultResTemplate();
         /* setting headers */
@@ -80,6 +80,9 @@ public class MoodleServiceImpl implements MoodleService {
             ExceptionMoodle exception = DataUtil.jsonToObject(response.getBody(), ExceptionMoodle.class);
             throw new RuntimeException(exception.getMessage());
         }
+        List<MoodleUserResponse> listUser = convertJsonToListUserResponse(response.getBody());
+        MoodleUserResponse userResponse = (listUser.size() > 0) ? listUser.get(0) : new MoodleUserResponse();
+        return userResponse;
     }
 
     @Override
@@ -278,6 +281,18 @@ public class MoodleServiceImpl implements MoodleService {
             TypeReference<List<MoodleCourseCategory>> jacksonTypeReference = new TypeReference<List<MoodleCourseCategory>>() {};
             List<MoodleCourseCategory> categoriyList = objectMapper.readValue(jsonArray, jacksonTypeReference);
             return categoriyList;
+        } catch (JsonProcessingException e) {
+            log.error("=== error in convertJsonToList - MoodleCourseCategory === {}", e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    private List<MoodleUserResponse> convertJsonToListUserResponse(String jsonArray) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            TypeReference<List<MoodleUserResponse>> jacksonTypeReference = new TypeReference<List<MoodleUserResponse>>() {};
+            List<MoodleUserResponse> result = objectMapper.readValue(jsonArray, jacksonTypeReference);
+            return result;
         } catch (JsonProcessingException e) {
             log.error("=== error in convertJsonToList - MoodleCourseCategory === {}", e.getMessage());
             throw new RuntimeException(e);

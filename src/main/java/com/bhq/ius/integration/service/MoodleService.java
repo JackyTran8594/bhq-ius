@@ -10,7 +10,7 @@ import java.io.File;
 
 
 public interface MoodleService {
-    void postUserToMoodleBackend(MoodleUser user);
+    MoodleUserResponse postUserToMoodleBackend(MoodleUser user);
     void postCourseToMoodleBackend(MoodleCourse data);
     MoodleCourseCategory getCourseCategoryDetailFromMoodleBackend(String key, String value);
     MoodleUploadFile uploadFileInMoodelWithDedicatedEndpoint(ByteArrayResource contentsAsResource, String fileName , String tokenForUser, String userId);

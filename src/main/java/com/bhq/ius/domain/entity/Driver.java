@@ -86,7 +86,7 @@ public class Driver extends Auditable<String> {
     private String soCMTCu;
 
     @Column(name = "ID_USER_MOODLE")
-    private String idUserMoodle;
+    private Long idUserMoodle;
 
     @Column(name = "STATE")
     @Enumerated(EnumType.STRING)
