@@ -9,6 +9,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.core.io.ClassPathResource;
 
+import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageInputStream;
+import javax.imageio.stream.ImageOutputStream;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -458,6 +464,19 @@ public class DataUtil {
             log.error("==== error replaceSpecialCharacterInBirthday ==== {}", e.getMessage());
             return date.toString();
         }
+    }
+
+    public static byte[] base64Jp2toImageJpg(String base64) throws IOException {
+        byte[] content = org.apache.tomcat.util.codec.binary.Base64.decodeBase64(base64);
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(content);
+        ImageInputStream imageInputStream = ImageIO.createImageInputStream(byteArrayInputStream);
+        BufferedImage imageJp2 = ImageIO.read(imageInputStream);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(byteArrayOutputStream);
+        ImageIO.write(imageJp2, "jpg", imageOutputStream);
+        byte[] result = byteArrayOutputStream.toByteArray();
+        byteArrayOutputStream.close();
+        return result;
     }
 
 }
