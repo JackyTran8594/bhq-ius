@@ -128,7 +128,8 @@ public class ReportOneServiceImpl implements ReportOneService {
     public BaseResponseData<List<Long>> submitCourse(List<Long> listId) {
         BaseResponseData<List<Long>> responseData = new BaseResponseData<>();
         try {
-            List<Course> courses = courseRepository.findAllById(listId);
+            List<Course> courses = getListCourse(listId);
+//            List<Course> courses = courseRepository.findAllById(listId);
             List<Long> listIdSubmitted = integrationUserSerive.CreateCourses(courses);
             responseData.initData(listIdSubmitted);
         } catch (Exception exception) {
@@ -143,8 +144,9 @@ public class ReportOneServiceImpl implements ReportOneService {
     public BaseResponseData<List<Long>> submitAvatar(List<Long> listId) {
         BaseResponseData<List<Long>> responseData = new BaseResponseData<>();
         try {
-            List<Driver> listDriver = driverRepository.findAllById(listId);
-            List<Long> listIdSubmitted = integrationUserSerive.UpdateUserPicture(listDriver);
+            List<Driver> drivers = getListDriver(listId);
+//            List<Driver> listDriver = driverRepository.findAllById(listId);
+            List<Long> listIdSubmitted = integrationUserSerive.UpdateUserPicture(drivers);
             responseData.initData(listIdSubmitted);
         } catch (Exception exception) {
             log.error("==== error in submitDriver ==== {}", exception.getMessage());
@@ -256,6 +258,26 @@ public class ReportOneServiceImpl implements ReportOneService {
             drivers = driverRepository.findAllById(listId);
         }
         return drivers;
+    }
+
+    protected List<Course> getListCourse(List<Long> listId) {
+        List<Course> items = new ArrayList<>();
+        if(DataUtil.isNullOrEmpty(listId)) {
+            items = courseRepository.findAllByStateNullOrStateNotIn(Collections.singletonList(RecordState.SUBMITTED));
+        } else {
+            items = courseRepository.findAllById(listId);
+        }
+        return items;
+    }
+
+    protected List<Profile> getListProfile(List<Long> listId) {
+        List<Profile> items = new ArrayList<>();
+        if(DataUtil.isNullOrEmpty(listId)) {
+            items = profileRepository.findAllByStateNullOrStateNotIn(Collections.singletonList(RecordState.SUBMITTED));
+        } else {
+            items = profileRepository.findAllById(listId);
+        }
+        return items;
     }
 
     private CourseDto getCourse(Node node) {
