@@ -4,19 +4,18 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.github.jaiimageio.jpeg2000.impl.J2KImageReader;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.core.io.ClassPathResource;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.ImageOutputStream;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.lang.reflect.Constructor;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -26,6 +25,7 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 @Slf4j
@@ -466,17 +466,30 @@ public class DataUtil {
         }
     }
 
-    public static byte[] base64Jp2toImageJpg(String base64) throws IOException {
-        byte[] content = org.apache.tomcat.util.codec.binary.Base64.decodeBase64(base64);
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(content);
-        ImageInputStream imageInputStream = ImageIO.createImageInputStream(byteArrayInputStream);
-        BufferedImage imageJp2 = ImageIO.read(imageInputStream);
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(byteArrayOutputStream);
-        ImageIO.write(imageJp2, "jpg", imageOutputStream);
-        byte[] result = byteArrayOutputStream.toByteArray();
-        byteArrayOutputStream.close();
-        return result;
+    public static byte[] base64Jp2toImageJpg(String base64) {
+        try {
+            byte[] content = org.apache.tomcat.util.codec.binary.Base64.decodeBase64(base64);
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(content);
+            Iterator<ImageReader> imageReader = ImageIO.getImageReadersBySuffix("jp2");
+            ImageInputStream imageInputStream = ImageIO.createImageInputStream(byteArrayInputStream);
+            BufferedImage image = null;
+            while (imageReader.hasNext()) {
+                ImageReader reader = imageReader.next();
+                J2KImageReader jp2Reader = (J2KImageReader) reader;
+                if (!DataUtil.isNullOrEmpty(jp2Reader)) {
+                    jp2Reader.setInput(imageInputStream);
+                    image = jp2Reader.read(0,null);
+                }
+            }
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(byteArrayOutputStream);
+            ImageIO.write(image, "jpg", imageOutputStream);
+            return byteArrayOutputStream.toByteArray();
+        } catch (IOException e) {
+            log.error("==== error in base64Jp2toImageJpg ==== {}", e.getMessage());
+            return null;
+        }
+
     }
 
 }

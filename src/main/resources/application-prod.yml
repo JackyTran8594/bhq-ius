@@ -8,6 +8,8 @@ app:
   adminUser: adminbhq
   moodleService:
     url: https://daotao.bhq.vn/moodle/webservice/rest/server.php
+    dedicated-endpoint: https://daotao.bhq.vn/moodle/webservice/upload.php
+    login-endpoint: https://daotao.bhq.vn/moodle/login/token.php?service=moodle_mobile_app
     token: ed10bf82b15919211e501da908de9857
 spring:
   application:

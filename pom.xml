@@ -171,6 +171,24 @@
 <!--			<version>2.17.1</version>-->
 <!--		</dependency>-->
 
+		<!-- handle image dependencies-->
+<!--		<dependency>-->
+<!--			<groupId>de.digitalcollections.imageio</groupId>-->
+<!--			<artifactId>imageio-turbojpeg</artifactId>-->
+<!--			<version>0.6.8</version>-->
+<!--		</dependency>-->
+
+<!--		<dependency>-->
+<!--			<groupId>de.digitalcollections.imageio</groupId>-->
+<!--			<artifactId>imageio-openjpeg</artifactId>-->
+<!--			<version>0.6.8</version>-->
+<!--		</dependency>-->
+		<dependency>
+			<groupId>com.github.jai-imageio</groupId>
+			<artifactId>jai-imageio-jpeg2000</artifactId>
+			<version>1.4.0</version>
+		</dependency>
+		<!-- end -->
 
 	</dependencies>
 

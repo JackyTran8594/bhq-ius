@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.w3c.dom.Element;
@@ -162,10 +163,9 @@ public class MoodleServiceImpl implements MoodleService {
     }
 
     @Override
-    public MoodleUploadFile uploadFileInMoodelWithDedicatedEndpoint(ByteArrayResource contentsAsResource, String fileName , String tokenForUser, String userId) {
+    public MoodleUploadFile uploadFileInMoodelWithDedicatedEndpoint(ByteArrayResource byteArrayResource, String fileName , String tokenForUser, String userId) {
         RestTemplate restTemplate = buildingDefaultResTemplate();
         HttpHeaders  headers = buildingDefaultHeaders();
-        HttpEntity<String> entity = new HttpEntity<>(headers);
 
         /* keeping param with order by linkedHashMap */
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
@@ -178,7 +178,7 @@ public class MoodleServiceImpl implements MoodleService {
         params.add("licence", "allrightsreserved");
         params.add("author", "");
         params.add("source", "");
-        params.add("file_1", contentsAsResource);
+        params.add("file_1", convertToHttpEntity(fileName, byteArrayResource.getByteArray()));
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity
                 = new HttpEntity<>(params, headers);
@@ -340,6 +340,17 @@ public class MoodleServiceImpl implements MoodleService {
             throw new RuntimeException(e);
         }
         return dto;
+    }
+
+    public static HttpEntity<byte[]> convertToHttpEntity(String filename, byte[] content) {
+        ContentDisposition contentDisposition = ContentDisposition.builder("form-data")
+                .name("file_1")
+                .filename(filename)
+                .build();
+
+        MultiValueMap<String, String> fileMap = new LinkedMultiValueMap<>();
+        fileMap.add(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString());
+        return new HttpEntity<>(content, fileMap);
     }
     /* End */
 

@@ -44,6 +44,12 @@ public class ReportOneController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @PostMapping("/test-get-driver")
+    public ResponseEntity<BaseResponseData<?>> testGetDriver(@RequestBody List<Long> listId) {
+        BaseResponseData<?> response = service.testGetDriver(listId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     @PostMapping("/submit-course")
     public ResponseEntity<BaseResponseData<?>> submitCourse(@RequestBody List<Long> listId) {
         BaseResponseData<?> response = service.submitCourse(listId);
@@ -53,6 +59,12 @@ public class ReportOneController {
     @PostMapping("/submit-avatar")
     public ResponseEntity<BaseResponseData<?>> submitAvatar(@RequestBody List<Long> listId) {
         BaseResponseData<?> response = service.submitAvatar(listId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/test-image")
+    public ResponseEntity<BaseResponseData<?>> testPostImage() {
+        BaseResponseData<?> response = service.testPostImage();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

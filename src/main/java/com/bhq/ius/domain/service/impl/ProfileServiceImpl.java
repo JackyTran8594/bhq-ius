@@ -1,5 +1,6 @@
 package com.bhq.ius.domain.service.impl;
 
+import com.bhq.ius.constant.RecordState;
 import com.bhq.ius.constant.XmlElement;
 import com.bhq.ius.domain.dto.*;
 import com.bhq.ius.domain.entity.Profile;
@@ -7,6 +8,7 @@ import com.bhq.ius.domain.repository.ProfileRepository;
 import com.bhq.ius.domain.service.ProfileService;
 import com.bhq.ius.domain.specification.GenericSpecificationBuilder;
 import com.bhq.ius.domain.specification.criteria.SearchCriteria;
+import com.bhq.ius.domain.specification.criteria.SearchOperation;
 import com.bhq.ius.utils.DataUtil;
 import com.bhq.ius.utils.XmlUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +51,9 @@ public class ProfileServiceImpl implements ProfileService {
                 builder.with(new SearchCriteria(matcher.group(1), matcher.group(3), matcher.group(6)));
             }
         }
+        /* default search with status not submitted*/
+        builder.with(new SearchCriteria("state", SearchOperation.NOT_EQUAL.getName(), RecordState.SUBMITTED.name()));
+        builder.with(new SearchCriteria("state", SearchOperation.NUL.getName(),""));
         // specification
         builder.setClazz(Profile.class);
         Specification<Profile> spec = builder.build();

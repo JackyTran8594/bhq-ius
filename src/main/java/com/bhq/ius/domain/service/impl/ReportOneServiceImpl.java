@@ -1,6 +1,7 @@
 package com.bhq.ius.domain.service.impl;
 
 import com.bhq.ius.constant.IusConstant;
+import com.bhq.ius.constant.RecordState;
 import com.bhq.ius.constant.XmlElement;
 import com.bhq.ius.domain.dto.*;
 import com.bhq.ius.domain.dto.common.BaseResponseData;
@@ -107,7 +108,12 @@ public class ReportOneServiceImpl implements ReportOneService {
     public BaseResponseData<List<Long>> submitDriver(List<Long> listId) {
         BaseResponseData<List<Long>> responseData = new BaseResponseData<>();
         try {
-            List<Driver> drivers = driverRepository.findAllById(listId);
+            List<Driver> drivers = getListDriver(listId);
+//            if(DataUtil.isNullOrEmpty(listId)) {
+//                drivers = driverRepository.findAllByStateNullAndStateNotIgnoreCase(RecordState.SUBMITTED);
+//            } else {
+//                drivers = driverRepository.findAllById(listId);
+//            }
             List<Long> listIdSubmitted = integrationUserSerive.CreateDrivers(drivers);
             responseData.initData(listIdSubmitted);
         } catch (Exception exception) {
@@ -148,6 +154,28 @@ public class ReportOneServiceImpl implements ReportOneService {
         return responseData;
     }
 
+    @Override
+    public BaseResponseData<List<Driver>> testGetDriver(List<Long> listId) {
+        BaseResponseData<List<Driver>> responseData = new BaseResponseData<>();
+        try {
+            List<Driver> drivers = getListDriver(listId);
+            responseData.initData(drivers);
+            return responseData;
+        } catch (Exception exception) {
+            log.error("==== error in testGetDriver ==== {}", exception.getMessage());
+            responseData.setError(HttpStatus.INTERNAL_SERVER_ERROR.name());
+            responseData.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+        return responseData;
+    }
+
+    @Override
+    public BaseResponseData<?> testPostImage() {
+        BaseResponseData<?> responseData = new BaseResponseData<>();
+        integrationUserSerive.testPostImage();
+        return responseData;
+    }
+
     private void saveIntoDb(DriverXmlDto dto) {
 
         Course course = CourseMapper.INSTANCE.toEntity(dto.getCourseDto());
@@ -160,6 +188,10 @@ public class ReportOneServiceImpl implements ReportOneService {
                 return x;
             }).toList();
             Optional<Profile> profile = profiles.stream().filter(x -> x.getSoCMT().equals(driver.getSoCMT())).map( x->{
+                byte[] byteImageArray = DataUtil.base64Jp2toImageJpg(x.getAnhChanDung());
+                if(!DataUtil.isNullOrEmpty(byteImageArray)) {
+                    x.setImageFile(byteImageArray);
+                }
                 x.setDriver(driver);
                 return x;
             }).findFirst();
@@ -170,8 +202,6 @@ public class ReportOneServiceImpl implements ReportOneService {
         dto.setDriversDto(DriverMapper.INSTANCE.toListDto(drivers));
         profileRepository.saveAll(profiles);
         documentRepository.saveAll(documents);
-
-
     }
 
     private DriverDto getDriver(Node node) {
@@ -216,6 +246,16 @@ public class ReportOneServiceImpl implements ReportOneService {
             log.error("==== error in getDriver ==== {}", e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    protected List<Driver> getListDriver(List<Long> listId) {
+        List<Driver> drivers = new ArrayList<>();
+        if(DataUtil.isNullOrEmpty(listId)) {
+            drivers = driverRepository.findAllByStateNullOrStateNotIn(Collections.singletonList(RecordState.SUBMITTED));
+        } else {
+            drivers = driverRepository.findAllById(listId);
+        }
+        return drivers;
     }
 
     private CourseDto getCourse(Node node) {
