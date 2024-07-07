@@ -42,6 +42,7 @@ public class JwtAuthenticationConfig {
                         .requestMatchers("/private/api/v1/driver/**").permitAll()
                         .requestMatchers("/private/api/v1/course/**").permitAll()
                         .requestMatchers("/private/api/v1/user/**").permitAll()
+                        .requestMatchers("/private/api/v1/profile/**").permitAll()
                         .requestMatchers("/public/api/v1/auth/**").permitAll()
                         .requestMatchers("/swagger*/**").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()

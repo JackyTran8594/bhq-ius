@@ -118,6 +118,10 @@ public class Profile extends Auditable<String> {
     @Column(name = "CHON_IN_GPLX")
     private String chonInGPLX;
 
+    @Lob
+    @Column(name = "IMAGE_FILE", columnDefinition="BLOB")
+    private byte[] imageFile;
+
     @Column(name = "STATE")
     @Enumerated(EnumType.STRING)
     private RecordState state;

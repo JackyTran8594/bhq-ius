@@ -1,6 +1,7 @@
 package com.bhq.ius.domain.service.impl;
 
 import com.bhq.ius.constant.IusConstant;
+import com.bhq.ius.constant.RecordState;
 import com.bhq.ius.constant.XmlElement;
 import com.bhq.ius.domain.dto.*;
 import com.bhq.ius.domain.dto.common.BaseResponseData;
@@ -107,7 +108,12 @@ public class ReportOneServiceImpl implements ReportOneService {
     public BaseResponseData<List<Long>> submitDriver(List<Long> listId) {
         BaseResponseData<List<Long>> responseData = new BaseResponseData<>();
         try {
-            List<Driver> drivers = driverRepository.findAllById(listId);
+            List<Driver> drivers = getListDriver(listId);
+//            if(DataUtil.isNullOrEmpty(listId)) {
+//                drivers = driverRepository.findAllByStateNullAndStateNotIgnoreCase(RecordState.SUBMITTED);
+//            } else {
+//                drivers = driverRepository.findAllById(listId);
+//            }
             List<Long> listIdSubmitted = integrationUserSerive.CreateDrivers(drivers);
             responseData.initData(listIdSubmitted);
         } catch (Exception exception) {
@@ -122,7 +128,8 @@ public class ReportOneServiceImpl implements ReportOneService {
     public BaseResponseData<List<Long>> submitCourse(List<Long> listId) {
         BaseResponseData<List<Long>> responseData = new BaseResponseData<>();
         try {
-            List<Course> courses = courseRepository.findAllById(listId);
+            List<Course> courses = getListCourse(listId);
+//            List<Course> courses = courseRepository.findAllById(listId);
             List<Long> listIdSubmitted = integrationUserSerive.CreateCourses(courses);
             responseData.initData(listIdSubmitted);
         } catch (Exception exception) {
@@ -130,6 +137,44 @@ public class ReportOneServiceImpl implements ReportOneService {
             responseData.setError(HttpStatus.INTERNAL_SERVER_ERROR.name());
             responseData.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
+        return responseData;
+    }
+
+    @Override
+    public BaseResponseData<List<Long>> submitAvatar(List<Long> listId) {
+        BaseResponseData<List<Long>> responseData = new BaseResponseData<>();
+        try {
+            List<Driver> drivers = getListDriver(listId);
+//            List<Driver> listDriver = driverRepository.findAllById(listId);
+            List<Long> listIdSubmitted = integrationUserSerive.UpdateUserPicture(drivers);
+            responseData.initData(listIdSubmitted);
+        } catch (Exception exception) {
+            log.error("==== error in submitDriver ==== {}", exception.getMessage());
+            responseData.setError(HttpStatus.INTERNAL_SERVER_ERROR.name());
+            responseData.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+        return responseData;
+    }
+
+    @Override
+    public BaseResponseData<List<Driver>> testGetDriver(List<Long> listId) {
+        BaseResponseData<List<Driver>> responseData = new BaseResponseData<>();
+        try {
+            List<Driver> drivers = getListDriver(listId);
+            responseData.initData(drivers);
+            return responseData;
+        } catch (Exception exception) {
+            log.error("==== error in testGetDriver ==== {}", exception.getMessage());
+            responseData.setError(HttpStatus.INTERNAL_SERVER_ERROR.name());
+            responseData.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+        return responseData;
+    }
+
+    @Override
+    public BaseResponseData<?> testPostImage() {
+        BaseResponseData<?> responseData = new BaseResponseData<>();
+        integrationUserSerive.testPostImage();
         return responseData;
     }
 
@@ -145,6 +190,10 @@ public class ReportOneServiceImpl implements ReportOneService {
                 return x;
             }).toList();
             Optional<Profile> profile = profiles.stream().filter(x -> x.getSoCMT().equals(driver.getSoCMT())).map( x->{
+                byte[] byteImageArray = DataUtil.base64Jp2toImageJpg(x.getAnhChanDung());
+                if(!DataUtil.isNullOrEmpty(byteImageArray)) {
+                    x.setImageFile(byteImageArray);
+                }
                 x.setDriver(driver);
                 return x;
             }).findFirst();
@@ -155,8 +204,6 @@ public class ReportOneServiceImpl implements ReportOneService {
         dto.setDriversDto(DriverMapper.INSTANCE.toListDto(drivers));
         profileRepository.saveAll(profiles);
         documentRepository.saveAll(documents);
-
-
     }
 
     private DriverDto getDriver(Node node) {
@@ -201,6 +248,36 @@ public class ReportOneServiceImpl implements ReportOneService {
             log.error("==== error in getDriver ==== {}", e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    protected List<Driver> getListDriver(List<Long> listId) {
+        List<Driver> drivers = new ArrayList<>();
+        if(DataUtil.isNullOrEmpty(listId)) {
+            drivers = driverRepository.findAllByStateNullOrStateNotIn(Collections.singletonList(RecordState.SUBMITTED));
+        } else {
+            drivers = driverRepository.findAllById(listId);
+        }
+        return drivers;
+    }
+
+    protected List<Course> getListCourse(List<Long> listId) {
+        List<Course> items = new ArrayList<>();
+        if(DataUtil.isNullOrEmpty(listId)) {
+            items = courseRepository.findAllByStateNullOrStateNotIn(Collections.singletonList(RecordState.SUBMITTED));
+        } else {
+            items = courseRepository.findAllById(listId);
+        }
+        return items;
+    }
+
+    protected List<Profile> getListProfile(List<Long> listId) {
+        List<Profile> items = new ArrayList<>();
+        if(DataUtil.isNullOrEmpty(listId)) {
+            items = profileRepository.findAllByStateNullOrStateNotIn(Collections.singletonList(RecordState.SUBMITTED));
+        } else {
+            items = profileRepository.findAllById(listId);
+        }
+        return items;
     }
 
     private CourseDto getCourse(Node node) {
@@ -295,15 +372,18 @@ public class ReportOneServiceImpl implements ReportOneService {
 
                     String ngayCapGPLXDaCo = XmlUtil.getTagValue("NGAY_CAP_GPLX_DACO", element);
                     if(!DataUtil.isNullOrEmpty(ngayCapGPLXDaCo)) {
-                        dto.setNgayCapGPLXDaCo(DataUtil.convertStringToLocalDate(ngayCapGPLXDaCo, IusConstant.DATE_FORMAT));
+                        String result = DataUtil.convertDateOfBirthWithFormat(ngayCapGPLXDaCo);
+                        dto.setNgayCapGPLXDaCo(DataUtil.convertStringToLocalDate(result, IusConstant.DATE_FORMAT));
                     }
-                    String ngayHHGPLXDaCo = XmlUtil.getTagValue("NGAY_CAP_GPLX_DACO", element);
+                    String ngayHHGPLXDaCo = XmlUtil.getTagValue("NGAY_HH_GPLX_DACO", element);
                     if(!DataUtil.isNullOrEmpty(ngayHHGPLXDaCo)) {
-                        dto.setNgayHHGPLXDaCo(DataUtil.convertStringToLocalDate(ngayHHGPLXDaCo, IusConstant.DATE_FORMAT));
+                        String result = DataUtil.convertDateOfBirthWithFormat(ngayHHGPLXDaCo);
+                        dto.setNgayHHGPLXDaCo(DataUtil.convertStringToLocalDate(result, IusConstant.DATE_FORMAT));
                     }
                     String ngayTTGPLXDaCo = XmlUtil.getTagValue("NGAY_TT_GPLX_DACO", element);
                     if(!DataUtil.isNullOrEmpty(ngayTTGPLXDaCo)) {
-                        dto.setNgayTTGPLXDaCo(DataUtil.convertStringToLocalDate(ngayTTGPLXDaCo, IusConstant.DATE_FORMAT));
+                        String result = DataUtil.convertDateOfBirthWithFormat(ngayTTGPLXDaCo);
+                        dto.setNgayTTGPLXDaCo(DataUtil.convertStringToLocalDate(result, IusConstant.DATE_FORMAT));
                     }
                     dto.setMaNoiHocLaiXe(XmlUtil.getTagValue("MA_NOI_HOC_LAIXE", element));
                     dto.setTenNoiHocLaiXe(XmlUtil.getTagValue("TEN_NOI_HOC_LAIXE", element));
