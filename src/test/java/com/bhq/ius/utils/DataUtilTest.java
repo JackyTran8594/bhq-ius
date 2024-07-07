@@ -48,10 +48,11 @@ class DataUtilTest {
 
     @Test
     void convertStringToLocalDate() {
-        String date = "1983-03-27";
-        LocalDate result = LocalDate.of(1983, 03, 27);
-        System.out.println("==== date ===== " + dataUtil.convertStringToLocalDate(date, "yyyy-MM-dd"));
-        assertEquals(result, dataUtil.convertStringToLocalDate(date, "yyyy-MM-dd"));
+        String date = "20171122";
+        String dateConvert = dataUtil.convertDateOfBirthWithFormat(date);
+        LocalDate result = LocalDate.of(2017, 11, 22);
+        System.out.println("==== date ===== " + dataUtil.convertStringToLocalDate(dateConvert, "yyyy-MM-dd"));
+        assertEquals(result, dataUtil.convertStringToLocalDate(dateConvert, "yyyy-MM-dd"));
     }
 
     @Test

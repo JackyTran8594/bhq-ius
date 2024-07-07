@@ -119,7 +119,7 @@ public class Profile extends Auditable<String> {
     private String chonInGPLX;
 
     @Lob
-    @Column(name = "IMAGE_FILE")
+    @Column(name = "IMAGE_FILE", columnDefinition="BLOB")
     private byte[] imageFile;
 
     @Column(name = "STATE")

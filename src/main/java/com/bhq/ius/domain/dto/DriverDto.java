@@ -1,5 +1,6 @@
 package com.bhq.ius.domain.dto;
 
+import com.bhq.ius.constant.RecordState;
 import com.bhq.ius.domain.dto.common.BaseDto;
 import lombok.*;
 
@@ -51,5 +52,7 @@ public class DriverDto extends BaseDto<String> {
     private String soCMTCu;
 
     private String uuid;
+
+    private RecordState state;
 
 }

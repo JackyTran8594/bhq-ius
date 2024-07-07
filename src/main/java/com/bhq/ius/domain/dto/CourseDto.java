@@ -1,5 +1,6 @@
 package com.bhq.ius.domain.dto;
 
+import com.bhq.ius.constant.RecordState;
 import com.bhq.ius.domain.dto.common.BaseDto;
 import lombok.*;
 
@@ -54,5 +55,6 @@ public class CourseDto extends BaseDto<String> {
 
     private String thoiGianDT;
     private String uuid;
+    private RecordState state;
 
 }

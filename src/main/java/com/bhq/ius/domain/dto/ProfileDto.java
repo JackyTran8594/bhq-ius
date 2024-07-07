@@ -1,5 +1,6 @@
 package com.bhq.ius.domain.dto;
 
+import com.bhq.ius.constant.RecordState;
 import com.bhq.ius.domain.dto.common.BaseDto;
 import lombok.*;
 import org.springframework.cglib.core.Local;
@@ -75,5 +76,6 @@ public class ProfileDto extends BaseDto<String> {
     private String chonInGPLX;
 
     private String driver_uuid;
+    private RecordState state;
 
 }

@@ -51,8 +51,8 @@ public class DriverServiceImpl implements DriverService {
             }
         }
         /* default search with status not submitted*/
-        builder.with(new SearchCriteria("state", SearchOperation.NOT_EQUAL.getName(), RecordState.SUBMITTED.name()));
-        builder.with(new SearchCriteria("state", SearchOperation.NUL.getName(),""));
+//        builder.with(new SearchCriteria("state", SearchOperation.NOT_EQUAL.getName(), RecordState.SUBMITTED.name()));
+//        builder.with(new SearchCriteria("state", SearchOperation.NUL.getName(),""));
         // specification
         builder.setClazz(Driver.class);
         Specification<Driver> spec = builder.build();

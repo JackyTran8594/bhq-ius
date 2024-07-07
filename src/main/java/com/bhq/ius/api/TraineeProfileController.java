@@ -18,7 +18,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/private/api/v1/profile")
-public class TraneeProfileController {
+public class TraineeProfileController {
 
     @Autowired
     private ProfileService service;
