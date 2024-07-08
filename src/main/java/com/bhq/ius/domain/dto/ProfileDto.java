@@ -23,7 +23,7 @@ public class ProfileDto extends BaseDto<String> {
 
     private String tenDVNhanHoSo;
 
-    private LocalDate ngayNhanHoSo;
+    private String ngayNhanHoSo;
 
     private String nguoiNhanHoSo;
 
@@ -35,7 +35,7 @@ public class ProfileDto extends BaseDto<String> {
 
     private String chatLuongAnh;
 
-    private LocalDate ngayThuNhanAnh;
+    private String ngayThuNhanAnh;
 
     private String nguoiThuNhanAnh;
 
@@ -49,11 +49,11 @@ public class ProfileDto extends BaseDto<String> {
 
     private String noiCapGPLXDaCo;
 
-    private LocalDate ngayCapGPLXDaCo;
+    private String ngayCapGPLXDaCo;
 
-    private LocalDate ngayHHGPLXDaCo;
+    private String ngayHHGPLXDaCo;
 
-    private LocalDate ngayTTGPLXDaCo;
+    private String ngayTTGPLXDaCo;
 
     private String maNoiHocLaiXe;
 

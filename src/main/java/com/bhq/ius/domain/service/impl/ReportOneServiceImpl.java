@@ -349,7 +349,7 @@ public class ReportOneServiceImpl implements ReportOneService {
                     String ngayNhanHoSo = XmlUtil.getTagValue("NGAY_NHAN_HOSO", element);
 
                     if(!DataUtil.isNullOrEmpty(ngayNhanHoSo)) {
-                        dto.setNgayNhanHoSo(DataUtil.convertStringToLocalDate(ngayNhanHoSo, IusConstant.DATE_FORMAT));
+                        dto.setNgayNhanHoSo(ngayNhanHoSo);
                     }
 
                     dto.setNguoiNhanHoSo(XmlUtil.getTagValue("NGUOI_NHAN_HOSO", element));
@@ -360,7 +360,7 @@ public class ReportOneServiceImpl implements ReportOneService {
 
                     String ngayThuNhanAnh = XmlUtil.getTagValue("NGAY_THU_NHAN_ANH", element);
                     if(!DataUtil.isNullOrEmpty(ngayThuNhanAnh)) {
-                        dto.setNgayThuNhanAnh(DataUtil.convertStringToLocalDate(ngayThuNhanAnh, IusConstant.DATE_FORMAT));
+                        dto.setNgayThuNhanAnh(ngayThuNhanAnh);
                     }
 
                     dto.setNguoiThuNhanAnh(XmlUtil.getTagValue("NGUOI_THU_NHAN_ANH", element));
@@ -372,18 +372,15 @@ public class ReportOneServiceImpl implements ReportOneService {
 
                     String ngayCapGPLXDaCo = XmlUtil.getTagValue("NGAY_CAP_GPLX_DACO", element);
                     if(!DataUtil.isNullOrEmpty(ngayCapGPLXDaCo)) {
-                        String result = DataUtil.convertDateOfBirthWithFormat(ngayCapGPLXDaCo);
-                        dto.setNgayCapGPLXDaCo(DataUtil.convertStringToLocalDate(result, IusConstant.DATE_FORMAT));
+                        dto.setNgayCapGPLXDaCo(ngayCapGPLXDaCo);
                     }
                     String ngayHHGPLXDaCo = XmlUtil.getTagValue("NGAY_HH_GPLX_DACO", element);
                     if(!DataUtil.isNullOrEmpty(ngayHHGPLXDaCo)) {
-                        String result = DataUtil.convertDateOfBirthWithFormat(ngayHHGPLXDaCo);
-                        dto.setNgayHHGPLXDaCo(DataUtil.convertStringToLocalDate(result, IusConstant.DATE_FORMAT));
+                        dto.setNgayHHGPLXDaCo(ngayHHGPLXDaCo);
                     }
                     String ngayTTGPLXDaCo = XmlUtil.getTagValue("NGAY_TT_GPLX_DACO", element);
                     if(!DataUtil.isNullOrEmpty(ngayTTGPLXDaCo)) {
-                        String result = DataUtil.convertDateOfBirthWithFormat(ngayTTGPLXDaCo);
-                        dto.setNgayTTGPLXDaCo(DataUtil.convertStringToLocalDate(result, IusConstant.DATE_FORMAT));
+                        dto.setNgayTTGPLXDaCo(ngayTTGPLXDaCo);
                     }
                     dto.setMaNoiHocLaiXe(XmlUtil.getTagValue("MA_NOI_HOC_LAIXE", element));
                     dto.setTenNoiHocLaiXe(XmlUtil.getTagValue("TEN_NOI_HOC_LAIXE", element));

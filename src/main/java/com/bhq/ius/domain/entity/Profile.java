@@ -52,14 +52,14 @@ public class Profile extends Auditable<String> {
     @Column(name = "TEN_LOAI_HOSO", columnDefinition = "NVARCHAR(500)")
     private String tenLoaiHoSo;
 
-    @Column(name = "ANH_CHAN_DUNG", columnDefinition = "TEXT")
+    @Column(name = "ANH_CHAN_DUNG", columnDefinition = "LONGTEXT")
     private String anhChanDung;
 
     @Column(name = "CHAT_LUONG_ANH")
     private String chatLuongAnh;
 
     @Column(name = "NGAY_THU_NHAN_ANH")
-    private LocalDate ngayThuNhanAnh;
+    private String ngayThuNhanAnh;
 
     @Column(name = "NGUOI_THU_NHAN_ANH", columnDefinition = "NVARCHAR(200)")
     private String nguoiThuNhanAnh;
@@ -80,13 +80,13 @@ public class Profile extends Auditable<String> {
     private String noiCapGPLXDaCo;
 
     @Column(name = "NGAY_CAP_GPLX_DACO")
-    private LocalDate ngayCapGPLXDaCo;
+    private String ngayCapGPLXDaCo;
 
     @Column(name = "NGAY_HH_GPLX_DACO")
-    private LocalDate ngayHHGPLXDaCo;
+    private String ngayHHGPLXDaCo;
 
     @Column(name = "NGAY_TT_GPLX_DACO")
-    private LocalDate ngayTTGPLXDaCo;
+    private String ngayTTGPLXDaCo;
 
     @Column(name = "MA_NOI_HOC_LAIXE")
     private String maNoiHocLaiXe;
