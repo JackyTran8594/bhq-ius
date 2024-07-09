@@ -76,6 +76,8 @@ public class ProfileDto extends BaseDto<String> {
     private String chonInGPLX;
 
     private String driver_uuid;
+    private String error;
+
     private RecordState state;
 
 }

@@ -52,6 +52,7 @@ public class DriverDto extends BaseDto<String> {
     private String soCMTCu;
 
     private String uuid;
+    private String error;
 
     private RecordState state;
 

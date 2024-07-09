@@ -55,6 +55,8 @@ public class CourseDto extends BaseDto<String> {
 
     private String thoiGianDT;
     private String uuid;
+    private String error;
+
     private RecordState state;
 
 }

@@ -40,9 +40,9 @@ public class CourseServiceImpl implements CourseService {
                 builder.with(new SearchCriteria(matcher.group(1), matcher.group(3), matcher.group(6)));
             }
         }
-        /* default search with status not submitted*/
-        builder.with(new SearchCriteria("state", SearchOperation.NOT_EQUAL.getName(), RecordState.SUBMITTED));
-        builder.with(new SearchCriteria("state", SearchOperation.NUL.getName(),""));
+//        /* default search with status not submitted*/
+//        builder.with(new SearchCriteria("state", SearchOperation.NOT_EQUAL.getName(), RecordState.SUBMITTED));
+//        builder.with(new SearchCriteria("state", SearchOperation.NUL.getName(),""));
         // specification
         builder.setClazz(Course.class);
         Specification<Course> spec = builder.build();
