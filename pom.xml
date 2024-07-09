@@ -330,6 +330,28 @@
 				</resources>
 			</build>
 		</profile>
+		<profile>
+			<id>sit</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<properties>
+				<spring.profiles.active>sit</spring.profiles.active>
+			</properties>
+			<build>
+				<filters>
+					<filter>
+						src/main/filters/dev/db.properties
+					</filter>
+				</filters>
+				<resources>
+					<resource>
+						<directory>src/main/resources</directory>
+						<filtering>true</filtering>
+					</resource>
+				</resources>
+			</build>
+		</profile>
 	</profiles>
 
 </project>
