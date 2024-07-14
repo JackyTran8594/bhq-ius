@@ -94,8 +94,11 @@ public class IntegrationUserServiceImpl implements IntegrationUserSerive {
                         /* call to moodle backend that getting categories id */
                         MoodleCourseCategory courseCategoriy = moodleService.getCourseCategoryDetailFromMoodleBackend(IusConstant.COURSE_CATEGORY_IDNUMBER, course.getMaHangDaoTao());
                         moodleCourse.setCategoryId(courseCategoriy.getId());
-                        moodleService.postCourseToMoodleBackend(moodleCourse);
+                        MoodleCourseResponse courseResponse = moodleService.postCourseToMoodleBackend(moodleCourse);
                         course.setState(RecordState.SUBMITTED);
+                        course.setIdCourseMoodle(courseResponse.getId().toString());
+                        course.setShortNameCourseMoodle(courseResponse.getShortname());
+
                     } catch (Exception exception) {
                         log.error("=== error in postUserToMoodleBackend === {}", exception.getMessage());
                         course.setState(RecordState.FAILED);
@@ -132,6 +135,27 @@ public class IntegrationUserServiceImpl implements IntegrationUserSerive {
                 }
                 profileRepository.save(profile);
                 result.add(profile.getId());
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<Long> UpdateUserEnroll(List<Driver> listDriver) {
+        List<Long> result = new ArrayList<>();
+        if (listDriver.size() > 0) {
+            for (Driver item : listDriver) {
+                Course course = item.getCourse();
+                try {
+                    moodleService.updateUserEnroll(item.getIdUserMoodle(), course.getIdCourseMoodle());
+                    item.setStateEnroll(RecordState.SUBMITTED);
+                } catch (Exception exception) {
+                    log.error("=== error in UpdateUserPicture === {}", exception.getMessage());
+                    item.setStateEnroll(RecordState.FAILED);
+                    item.setErrorEnroll(exception.getMessage());
+                }
+                driverRepository.save(item);
+                result.add(item.getId());
             }
         }
         return result;

@@ -109,11 +109,6 @@ public class ReportOneServiceImpl implements ReportOneService {
         BaseResponseData<List<Long>> responseData = new BaseResponseData<>();
         try {
             List<Driver> drivers = getListDriver(listId);
-//            if(DataUtil.isNullOrEmpty(listId)) {
-//                drivers = driverRepository.findAllByStateNullAndStateNotIgnoreCase(RecordState.SUBMITTED);
-//            } else {
-//                drivers = driverRepository.findAllById(listId);
-//            }
             List<Long> listIdSubmitted = integrationUserSerive.CreateDrivers(drivers);
             responseData.initData(listIdSubmitted);
         } catch (Exception exception) {
@@ -147,6 +142,21 @@ public class ReportOneServiceImpl implements ReportOneService {
             List<Driver> drivers = getListDriver(listId);
 //            List<Driver> listDriver = driverRepository.findAllById(listId);
             List<Long> listIdSubmitted = integrationUserSerive.UpdateUserPicture(drivers);
+            responseData.initData(listIdSubmitted);
+        } catch (Exception exception) {
+            log.error("==== error in submitDriver ==== {}", exception.getMessage());
+            responseData.setError(HttpStatus.INTERNAL_SERVER_ERROR.name());
+            responseData.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+        return responseData;
+    }
+
+    @Override
+    public BaseResponseData<List<Long>> submitEnroll(List<Long> listId) {
+        BaseResponseData<List<Long>> responseData = new BaseResponseData<>();
+        try {
+            List<Driver> drivers = getListDriver(listId);
+            List<Long> listIdSubmitted = integrationUserSerive.UpdateUserEnroll(drivers);
             responseData.initData(listIdSubmitted);
         } catch (Exception exception) {
             log.error("==== error in submitDriver ==== {}", exception.getMessage());

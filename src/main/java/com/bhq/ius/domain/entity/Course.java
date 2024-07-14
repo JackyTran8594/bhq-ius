@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -93,5 +94,14 @@ public class Course extends Auditable<String> {
 
     @Column(name = "ERROR", length = 1000)
     private String error;
+
+    @Column(name = "ID_COURSE_MOODLE")
+    private String idCourseMoodle;
+
+    @Column(name = "SHORTNAME_COURSE_MOODLE")
+    private String shortNameCourseMoodle;
+
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+    private Set<Driver> drivers;
 
 }

@@ -10,5 +10,6 @@ public interface IntegrationUserSerive {
     List<Long> CreateDrivers(List<Driver> listDriver);
     List<Long> CreateCourses(List<Course> listCourse);
     List<Long> UpdateUserPicture(List<Driver> listDriver);
+    List<Long> UpdateUserEnroll(List<Driver> listDriver);
     void testPostImage();
 }

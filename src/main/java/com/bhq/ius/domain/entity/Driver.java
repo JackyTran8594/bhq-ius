@@ -95,11 +95,22 @@ public class Driver extends Auditable<String> {
     @Column(name = "ERROR", length = 1000)
     private String error;
 
+    @Column(name = "STATE_ENROLL")
+    @Enumerated(EnumType.STRING)
+    private RecordState stateEnroll;
+
+    @Column(name = "ERROR_ENROLL", length = 1000)
+    private String errorEnroll;
+
     @OneToOne(mappedBy = "driver", cascade = CascadeType.ALL)
     private Profile profile;
 
     @OneToMany(mappedBy = "driver", cascade = CascadeType.ALL)
     private Set<Document> document;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "course_id", referencedColumnName = "id")
+    private Course course;
 
 
 }

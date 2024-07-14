@@ -87,7 +87,7 @@ public class MoodleServiceImpl implements MoodleService {
     }
 
     @Override
-    public void postCourseToMoodleBackend(MoodleCourse data) {
+    public MoodleCourseResponse postCourseToMoodleBackend(MoodleCourse data) {
         /* setting resttemplate */
         RestTemplate restTemplate = buildingDefaultResTemplate();
         /* setting headers */
@@ -119,6 +119,9 @@ public class MoodleServiceImpl implements MoodleService {
             ExceptionMoodle exception = DataUtil.jsonToObject(response.getBody(), ExceptionMoodle.class);
             throw new RuntimeException(exception.getMessage());
         }
+        List<MoodleCourseResponse> listCourse = convertJsonToListCourseResponse(response.getBody());
+        MoodleCourseResponse courseResponse = (listCourse.size() > 0) ? listCourse.get(0) : new MoodleCourseResponse();
+        return courseResponse;
     }
 
     /**
@@ -227,6 +230,38 @@ public class MoodleServiceImpl implements MoodleService {
     }
 
     @Override
+    public void updateUserEnroll(String userId, String courseId) {
+        RestTemplate restTemplate = buildingDefaultResTemplate();
+        HttpHeaders  headers = buildingDefaultHeaders();
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        /* keeping param with order by linkedHashMap */
+        LinkedHashMap<String, String> params = new LinkedHashMap<>();
+        params.put("enrolments[0][roleid]","5");
+        params.put("enrolments[0][userid]", userId.toString());
+        params.put("enrolments[0][courseid]", courseId);
+//        params.put("enrolments[0][timestart]", password);
+//        params.put("enrolments[0][timeend]", password);
+//        params.put("enrolments[0][suspend]", password);
+
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(moodleServiceLoginEndpoint.trim());
+
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            builder.queryParam(entry.getKey(), entry.getValue());
+        }
+        log.info("=== uri === {}", builder.toUriString());
+        HttpEntity<String> response = restTemplate.exchange(builder.toUriString(), HttpMethod.POST, entity, String.class, headers);
+        log.info("==== response from moodle backend - get token user ==== {}", response);
+        log.info("==== body from response from moodle backend - get token user ==== {}", response.getBody());
+        if(response.getBody().contains("exception")) {
+            ExceptionMoodle exception = DataUtil.jsonToObject(response.getBody(), ExceptionMoodle.class);
+            throw new RuntimeException(exception.getMessage());
+        }
+    }
+
+    @Override
     public void updateUserPicture(String token, String draftItemId, String userId) {
         /* setting resttemplate */
         RestTemplate restTemplate = buildingDefaultResTemplate();
@@ -292,6 +327,18 @@ public class MoodleServiceImpl implements MoodleService {
             ObjectMapper objectMapper = new ObjectMapper();
             TypeReference<List<MoodleUserResponse>> jacksonTypeReference = new TypeReference<List<MoodleUserResponse>>() {};
             List<MoodleUserResponse> result = objectMapper.readValue(jsonArray, jacksonTypeReference);
+            return result;
+        } catch (JsonProcessingException e) {
+            log.error("=== error in convertJsonToList - MoodleCourseCategory === {}", e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    private List<MoodleCourseResponse> convertJsonToListCourseResponse(String jsonArray) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            TypeReference<List<MoodleCourseResponse>> jacksonTypeReference = new TypeReference<List<MoodleCourseResponse>>() {};
+            List<MoodleCourseResponse> result = objectMapper.readValue(jsonArray, jacksonTypeReference);
             return result;
         } catch (JsonProcessingException e) {
             log.error("=== error in convertJsonToList - MoodleCourseCategory === {}", e.getMessage());

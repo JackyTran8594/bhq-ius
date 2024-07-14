@@ -16,6 +16,7 @@ public interface ReportOneService {
     BaseResponseData<List<Long>> submitDriver(List<Long> listId);
     BaseResponseData<List<Long>> submitCourse(List<Long> listId);
     BaseResponseData<List<Long>> submitAvatar(List<Long> listId);
+    BaseResponseData<List<Long>> submitEnroll(List<Long> listId);
     BaseResponseData<List<Driver>> testGetDriver(List<Long> listId);
     BaseResponseData<?> testPostImage();
 

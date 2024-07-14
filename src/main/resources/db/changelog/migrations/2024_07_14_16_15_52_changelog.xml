@@ -1,0 +1,21 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet author="BACHTUVU (generated)" id="1720973761075-1">
+        <addColumn tableName="driver">
+            <column name="course_id" type="bigint"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="BACHTUVU (generated)" id="1720973761075-2">
+        <addColumn tableName="driver">
+            <column name="error_enroll" type="varchar(1000)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="BACHTUVU (generated)" id="1720973761075-3">
+        <addColumn tableName="driver">
+            <column name="state_enroll" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="BACHTUVU (generated)" id="1720973761075-4">
+        <addForeignKeyConstraint baseColumnNames="course_id" baseTableName="driver" constraintName="FKm9ohci9kwow1emcpkclw25lk5" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="course" validate="true"/>
+    </changeSet>
+</databaseChangeLog>

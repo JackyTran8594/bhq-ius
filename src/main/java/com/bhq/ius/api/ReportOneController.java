@@ -62,6 +62,12 @@ public class ReportOneController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @PostMapping("/submit-enroll")
+    public ResponseEntity<BaseResponseData<?>> submitEnroll(@RequestBody List<Long> listId) {
+        BaseResponseData<?> response = service.submitEnroll(listId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     @PostMapping("/test-image")
     public ResponseEntity<BaseResponseData<?>> testPostImage() {
         BaseResponseData<?> response = service.testPostImage();

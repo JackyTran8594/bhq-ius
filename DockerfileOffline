@@ -15,9 +15,11 @@ RUN mvn clean install -Pprod
 
 ### STAGE 2: DEPLOY APPLICATION
 FROM amazoncorretto:17.0.8-alpine
+RUN apk update && apk add net-tools
 WORKDIR /app
 COPY --from=builders /app/target/bhq-ius-0.0.1.jar /app/
 RUN ls -la
+#ENTRYPOINT ["/bin/sh","-c","echo 10.15.200.30  daotao.bhq.vn >> /etc/hosts"]
 ENTRYPOINT ["java","-jar", "bhq-ius-0.0.1.jar"]
 
 
