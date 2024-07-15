@@ -63,7 +63,7 @@ public enum SearchOperation {
             case "le":
             case "<" :
                 return LESS_THAN_EQUAL;
-            default: return null;
+            default: return ALL;
         }
     }
 

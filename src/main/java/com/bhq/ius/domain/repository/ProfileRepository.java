@@ -14,4 +14,5 @@ import java.util.List;
 @Repository
 public interface ProfileRepository extends JpaRepository<Profile, Long>, ProfileRepositorySpecification, ProfileRepositoryCustom {
     List<Profile> findAllByStateNullOrStateNotIn(List<RecordState> state);
+    Long countByStateIn(List<RecordState> recordState);
 }

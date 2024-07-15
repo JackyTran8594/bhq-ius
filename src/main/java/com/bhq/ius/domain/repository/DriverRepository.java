@@ -17,5 +17,7 @@ import java.util.List;
 public interface DriverRepository extends JpaRepository<Driver, Long>, DriverRepositorySpecification, DriverRepositoryCustom {
 
     List<Driver> findAllByStateNullOrStateNotIn(List<RecordState> state);
+    Long countByStateIn(List<RecordState> recordState);
+    Long countByStateEnrollIn(List<RecordState> recordState);
 
 }

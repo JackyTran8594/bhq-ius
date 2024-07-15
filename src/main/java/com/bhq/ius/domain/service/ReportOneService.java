@@ -1,6 +1,7 @@
 package com.bhq.ius.domain.service;
 
 import com.bhq.ius.domain.dto.DriverDto;
+import com.bhq.ius.domain.dto.ReportOneInfoDto;
 import com.bhq.ius.domain.dto.UserDto;
 import com.bhq.ius.domain.dto.common.BaseResponseData;
 import com.bhq.ius.domain.entity.Driver;
@@ -17,6 +18,7 @@ public interface ReportOneService {
     BaseResponseData<List<Long>> submitCourse(List<Long> listId);
     BaseResponseData<List<Long>> submitAvatar(List<Long> listId);
     BaseResponseData<List<Long>> submitEnroll(List<Long> listId);
+    BaseResponseData<ReportOneInfoDto> getReportOneInfo(Long id);
     BaseResponseData<List<Driver>> testGetDriver(List<Long> listId);
     BaseResponseData<?> testPostImage();
 

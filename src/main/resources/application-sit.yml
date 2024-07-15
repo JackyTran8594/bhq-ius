@@ -4,7 +4,7 @@ server:
     context-path: /bhq-ius
 app:
   jwtSecret: test
-  tokenValidity: 28600
+  tokenValidity: 1800
   adminUser: adminbhq
   moodleService:
     url: https://daotao.bhq.vn/moodle/webservice/rest/server.php

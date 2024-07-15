@@ -38,6 +38,8 @@ public class GenericSpecificationBuilder<T> {
 
     public Specification<T> build() {
         if(params.size() == 0) {
+//            Specification<T> result = new GenericSpecification();
+//            return result;
             return null;
         }
 

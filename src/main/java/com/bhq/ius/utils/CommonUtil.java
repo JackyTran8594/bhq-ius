@@ -20,25 +20,25 @@ public class CommonUtil {
         }
 
         List<Sort.Order> orderList = new ArrayList<>();
-        if (sort.get(0).contains(",")) {
+//        if (sort.get(0).contains(",")) {
             String[] strArray;
             for (String str : sort) {
-                strArray = str.split(",");
+                strArray = str.split("_");
                 if (strArray.length > 1) {
-                    if ("asc".equalsIgnoreCase(strArray[0])) {
-                        orderList.add(Sort.Order.asc(camelToSnake(strArray[0])));
+                    if ("ascend".equalsIgnoreCase(strArray[1])) {
+                        orderList.add(Sort.Order.asc(strArray[0]));
                     } else {
-                        orderList.add(Sort.Order.desc(camelToSnake(strArray[0])));
+                        orderList.add(Sort.Order.desc(strArray[0]));
                     }
                 } else {
-                    orderList.add(Sort.Order.asc(camelToSnake(strArray[0])));
+                    orderList.add(Sort.Order.asc(strArray[0]));
                 }
             }
-        } else {
-            for(String s: sort) {
-                orderList.add(Sort.Order.asc(camelToSnake(s)));
-            }
-        }
+//        } else {
+//            for(String s: sort) {
+//                orderList.add(Sort.Order.asc(camelToSnake(s)));
+//            }
+//        }
         return Sort.by(orderList);
     }
     public static PageRequest pageRequest(List<String> sort, Integer page, Integer size) {

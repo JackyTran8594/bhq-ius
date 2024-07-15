@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("/private/api/v1/driver")
@@ -25,10 +27,20 @@ public class DriverController {
 
     @GetMapping()
     public ResponseEntity<BaseResponseData<DriverDto>> search(@RequestParam(name = "pageNumber") int pageNumber,
-                                                            @RequestParam(name = "pageSize") int pageSize,
-                                                            @RequestParam(name = "search") Optional<String> search) {
+                                                              @RequestParam(name = "pageSize") int pageSize,
+                                                              @RequestParam(name = "search") Optional<String> search,
+                                                              @RequestParam(name = "sort") Optional<String> sort) {
         BaseResponseData<DriverDto> response = new BaseResponseData<>();
-        Pageable page = CommonUtil.pageRequest(new ArrayList<>(), pageNumber - 1, pageSize);
+        List<String> sorts = new ArrayList<>();
+        // sort pattern: (\w+?)(,)
+        if (sort.isPresent()) {
+            Pattern pattern = Pattern.compile("(\\w+?)(,)", Pattern.UNICODE_CHARACTER_CLASS);
+            Matcher matcher = pattern.matcher(sort.get());
+            while (matcher.find()) {
+                sorts.add(matcher.group(1));
+            }
+        }
+        Pageable page = CommonUtil.pageRequest(sorts, pageNumber - 1, pageSize);
         Page<DriverDto> listDTO = service.findBySearchParam(search, page);
         // response
         response.pagingData = listDTO;

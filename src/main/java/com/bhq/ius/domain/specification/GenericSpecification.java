@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
 public class GenericSpecification<T> implements Specification<T> {
 
     private final SearchCriteria searchCriteria;
+
     public GenericSpecification (final SearchCriteria searchCriteria, Class<T> clazz) {
         super();
         String dataType = findDataType(searchCriteria.getKey(), clazz);
@@ -99,7 +100,6 @@ public class GenericSpecification<T> implements Specification<T> {
             case LESS_THAN:
                 return criteriaBuilder.lessThan(root.<String>get(searchCriteria.getKey()), searchCriteria.getValue().toString().trim());
             case LESS_THAN_EQUAL:
-
                 return criteriaBuilder.lessThanOrEqualTo(root.<String>get(searchCriteria.getKey()), searchCriteria.getValue().toString().trim());
         }
         return null;

@@ -28,6 +28,7 @@ import org.w3c.dom.NodeList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -45,7 +46,7 @@ public class DriverServiceImpl implements DriverService {
         // check chuỗi để tách các param search
         if (DataUtil.notNull(search)) {
             Pattern pattern = Pattern.compile("(\\w+?)(\\.)(:|<|>|(\\w+?))(\\.)(\\w+?),", Pattern.UNICODE_CHARACTER_CLASS);
-            Matcher matcher = pattern.matcher(search + ",");
+            Matcher matcher = pattern.matcher(search.get() + ",");
             while (matcher.find()) {
                 builder.with(new SearchCriteria(matcher.group(1), matcher.group(3), matcher.group(6)));
             }
@@ -108,6 +109,11 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public List<Driver> findAll() {
         return repository.findAll();
+    }
+
+    @Override
+    public Long countByStateSuccess(RecordState state) {
+        return repository.countByStateIn(Collections.singletonList(state));
     }
 
 }

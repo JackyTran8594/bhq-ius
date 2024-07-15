@@ -167,6 +167,39 @@ public class ReportOneServiceImpl implements ReportOneService {
     }
 
     @Override
+    public BaseResponseData<ReportOneInfoDto> getReportOneInfo(Long id) {
+        BaseResponseData<ReportOneInfoDto> responseData = new BaseResponseData<>();
+        ReportOneInfoDto reportOneInfoDto = new ReportOneInfoDto();
+        Long driverSuccess = driverRepository.countByStateIn(Collections.singletonList(RecordState.SUBMITTED));
+        Long driverFailed = driverRepository.countByStateIn(Collections.singletonList(RecordState.FAILED));
+        Long driverNotSubmitted = driverRepository.count() - driverSuccess - driverFailed;
+
+        Long profileSuccess = profileRepository.countByStateIn(Collections.singletonList(RecordState.SUBMITTED));
+        Long profileFailed = profileRepository.countByStateIn(Collections.singletonList(RecordState.FAILED));
+        Long profileNotSubmitted = profileRepository.count() - profileSuccess - profileFailed;
+
+        Long enrollSuccess = driverRepository.countByStateEnrollIn(Collections.singletonList(RecordState.SUBMITTED));
+        Long enrollFailed = driverRepository.countByStateEnrollIn(Collections.singletonList(RecordState.FAILED));
+        Long enrollNotSubmitted = driverRepository.count() - enrollSuccess - enrollFailed;
+
+        reportOneInfoDto.setDriverSuccess(driverSuccess);
+        reportOneInfoDto.setDriverFailed(driverFailed);
+        reportOneInfoDto.setDriverNotSubmitted(driverNotSubmitted);
+
+        reportOneInfoDto.setProfileSuccess(profileSuccess);
+        reportOneInfoDto.setProfileFailed(profileFailed);
+        reportOneInfoDto.setProfileNotSubmitted(profileNotSubmitted);
+
+        reportOneInfoDto.setEnrollSuccess(enrollSuccess);
+        reportOneInfoDto.setEnrollFailed(enrollFailed);
+        reportOneInfoDto.setEnrollNotSubmitted(enrollNotSubmitted);
+
+        responseData.setData(reportOneInfoDto);
+
+        return responseData;
+    }
+
+    @Override
     public BaseResponseData<List<Driver>> testGetDriver(List<Long> listId) {
         BaseResponseData<List<Driver>> responseData = new BaseResponseData<>();
         try {
