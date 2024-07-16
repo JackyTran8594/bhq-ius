@@ -3,6 +3,7 @@ package com.bhq.ius.domain.specification;
 
 import com.bhq.ius.domain.specification.criteria.SearchCriteria;
 import com.bhq.ius.domain.specification.criteria.SearchOperation;
+import jakarta.persistence.criteria.Predicate;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.jpa.domain.Specification;
@@ -51,6 +52,7 @@ public class GenericSpecificationBuilder<T> {
             result = SearchOperation.getDataOption(searchCriteria.getOperation()) == SearchOperation.ALL
                     ? Specification.where(result).and(new GenericSpecification<T>(searchCriteria, clazz))
                     : Specification.where(result).or(new GenericSpecification<T>(searchCriteria, clazz));
+
         }
 
         return result;

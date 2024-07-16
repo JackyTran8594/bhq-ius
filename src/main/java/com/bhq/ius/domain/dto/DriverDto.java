@@ -53,7 +53,13 @@ public class DriverDto extends BaseDto<String> {
 
     private String uuid;
     private String error;
+    private Long courseId;
 
     private RecordState state;
+    private RecordState stateProfile;
+    private String errorProfile;
+    private RecordState stateEnroll;
+    private String errorEnroll;
+
 
 }

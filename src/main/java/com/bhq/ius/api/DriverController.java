@@ -29,7 +29,8 @@ public class DriverController {
     public ResponseEntity<BaseResponseData<DriverDto>> search(@RequestParam(name = "pageNumber") int pageNumber,
                                                               @RequestParam(name = "pageSize") int pageSize,
                                                               @RequestParam(name = "search") Optional<String> search,
-                                                              @RequestParam(name = "sort") Optional<String> sort) {
+                                                              @RequestParam(name = "sort") Optional<String> sort,
+                                                              @RequestParam(name = "courseId") Optional<Long> courseId) {
         BaseResponseData<DriverDto> response = new BaseResponseData<>();
         List<String> sorts = new ArrayList<>();
         // sort pattern: (\w+?)(,)
@@ -41,7 +42,7 @@ public class DriverController {
             }
         }
         Pageable page = CommonUtil.pageRequest(sorts, pageNumber - 1, pageSize);
-        Page<DriverDto> listDTO = service.findBySearchParam(search, page);
+        Page<DriverDto> listDTO = service.findBySearchParam(search, page, courseId);
         // response
         response.pagingData = listDTO;
         response.success();

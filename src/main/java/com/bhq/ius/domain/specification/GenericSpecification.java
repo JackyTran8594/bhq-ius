@@ -1,6 +1,7 @@
 package com.bhq.ius.domain.specification;
 
 
+import com.bhq.ius.domain.entity.Course;
 import com.bhq.ius.domain.specification.criteria.SearchCriteria;
 import com.bhq.ius.domain.specification.criteria.SearchOperation;
 import com.bhq.ius.utils.DataUtil;
@@ -118,7 +119,20 @@ public class GenericSpecification<T> implements Specification<T> {
             Field field = fields[i];
             if(field.getType().equals(Enum.class)) {
                 dataType = "String";
-            } else {
+            }
+//            else if (field.getType().equals(Course.class)) {
+//                Field[] fieldSubClass = field.getType().getDeclaredFields();
+//                for (int j = 0; j < fieldSubClass.length; j++) {
+//                    Field fieldSub = fieldSubClass[j];
+//                    if (fieldName.equals(fieldSub.getName())) {
+//                        String[] str = fieldSub.getType().getTypeName().split(Pattern.quote("."));
+//                        // str[2] = dataType
+//                        dataType = str[2];
+//                        break;
+//                    }
+//                }
+//            }
+            else {
                 if (fieldName.equals(field.getName())) {
                     String[] str = field.getType().getTypeName().split(Pattern.quote("."));
                     // str[2] = dataType

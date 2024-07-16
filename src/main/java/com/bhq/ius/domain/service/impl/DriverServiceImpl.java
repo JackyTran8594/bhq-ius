@@ -4,7 +4,9 @@ import com.bhq.ius.constant.RecordState;
 import com.bhq.ius.constant.RecordStatus;
 import com.bhq.ius.constant.XmlElement;
 import com.bhq.ius.domain.dto.*;
+import com.bhq.ius.domain.entity.Course;
 import com.bhq.ius.domain.entity.Driver;
+import com.bhq.ius.domain.repository.CourseRepository;
 import com.bhq.ius.domain.repository.DriverRepository;
 import com.bhq.ius.domain.service.DriverService;
 import com.bhq.ius.domain.specification.GenericSpecificationBuilder;
@@ -16,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -28,6 +31,7 @@ import org.w3c.dom.NodeList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -40,29 +44,51 @@ public class DriverServiceImpl implements DriverService {
 
     @Autowired
     private DriverRepository repository;
+
+    @Autowired
+    private CourseRepository courseRepository;
+
     @Override
-    public Page<DriverDto> findBySearchParam(Optional<String> search, Pageable page) {
+    public Page<DriverDto> findBySearchParam(Optional<String> search, Pageable page, Optional<Long> courseId) {
         GenericSpecificationBuilder<Driver> builder = new GenericSpecificationBuilder<>();
         // check chuỗi để tách các param search
-        if (DataUtil.notNull(search)) {
+        if (search.isPresent()) {
             Pattern pattern = Pattern.compile("(\\w+?)(\\.)(:|<|>|(\\w+?))(\\.)(\\w+?),", Pattern.UNICODE_CHARACTER_CLASS);
-            Matcher matcher = pattern.matcher(search.get() + ",");
+            Matcher matcher = pattern.matcher(search.get());
             while (matcher.find()) {
                 builder.with(new SearchCriteria(matcher.group(1), matcher.group(3), matcher.group(6)));
             }
         }
-        /* default search with status not submitted*/
-//        builder.with(new SearchCriteria("state", SearchOperation.NOT_EQUAL.getName(), RecordState.SUBMITTED.name()));
-//        builder.with(new SearchCriteria("state", SearchOperation.NUL.getName(),""));
-        // specification
+
         builder.setClazz(Driver.class);
         Specification<Driver> spec = builder.build();
-        Page<DriverDto> listDTO = repository.findAll(spec, page).map(entity -> {
-            DriverDto dto = new DriverDto();
-            BeanUtils.copyProperties(entity, dto);
-            return dto;
-        });
-        return listDTO;
+        List<DriverDto> listEntities = new ArrayList<>();
+        if (courseId.isPresent()) {
+            listEntities = repository.findAll(spec).stream().filter(x -> !DataUtil.isNullOrEmpty(x.getCourse()) && Long.valueOf(7L).equals(x.getCourse().getId())).map(entity -> {
+                DriverDto dto = new DriverDto();
+                BeanUtils.copyProperties(entity, dto);
+                dto.setCourseId(entity.getCourse().getId());
+                dto.setStateProfile(!DataUtil.isNullOrEmpty(entity.getProfile().getState()) ? entity.getProfile().getState() : null);
+                dto.setErrorProfile(!DataUtil.isNullOrEmpty(entity.getProfile().getError()) ? entity.getProfile().getError().substring(0, 100) : null);
+                dto.setStateEnroll(!DataUtil.isNullOrEmpty(entity.getStateEnroll()) ? entity.getStateEnroll() : null);
+                dto.setErrorEnroll(!DataUtil.isNullOrEmpty(entity.getErrorEnroll()) ? entity.getErrorEnroll().substring(0, 100) : null);
+                return dto;
+            }).toList();
+        } else {
+            listEntities = repository.findAll(spec).stream().map(entity -> {
+                DriverDto dto = new DriverDto();
+                BeanUtils.copyProperties(entity, dto);
+                dto.setCourseId(entity.getCourse().getId());
+                dto.setStateProfile(!DataUtil.isNullOrEmpty(entity.getProfile().getState()) ? entity.getProfile().getState() : null);
+                dto.setErrorProfile(!DataUtil.isNullOrEmpty(entity.getProfile().getError()) ? entity.getProfile().getError().substring(0, 100) : null);
+                dto.setStateEnroll(!DataUtil.isNullOrEmpty(entity.getStateEnroll()) ? entity.getStateEnroll() : null);
+                dto.setErrorEnroll(!DataUtil.isNullOrEmpty(entity.getErrorEnroll()) ? entity.getErrorEnroll().substring(0, 100) : null);
+                return dto;
+            }).toList();
+        }
+
+        Page<DriverDto> result = new PageImpl<>(listEntities, page, listEntities.size());
+        return result;
     }
 
     @Override
@@ -76,7 +102,7 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public DriverDto update(DriverDto dto) {
         Optional<Driver> entity = repository.findById(dto.getId());
-        if(entity.isPresent()) {
+        if (entity.isPresent()) {
             BeanUtils.copyProperties(dto, entity);
             repository.save(entity.get());
         }

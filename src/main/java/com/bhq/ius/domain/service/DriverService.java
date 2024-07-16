@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface DriverService {
-    Page<DriverDto> findBySearchParam(Optional<String> search, Pageable page);
+    Page<DriverDto> findBySearchParam(Optional<String> search, Pageable page, Optional<Long> courseId);
     DriverDto create(DriverDto dto);
     DriverDto update(DriverDto dto);
     void deleteById(Long id);

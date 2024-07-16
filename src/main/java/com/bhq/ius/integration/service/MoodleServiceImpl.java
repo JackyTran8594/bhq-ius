@@ -27,6 +27,9 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -230,33 +233,44 @@ public class MoodleServiceImpl implements MoodleService {
     }
 
     @Override
-    public void updateUserEnroll(String userId, String courseId) {
+    public void updateUserEnroll(String userId, String courseId, String token, String username) {
         RestTemplate restTemplate = buildingDefaultResTemplate();
         HttpHeaders  headers = buildingDefaultHeaders();
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
+        long startDate = LocalDate.now().toEpochSecond(LocalTime.NOON, ZoneOffset.MIN);
         /* keeping param with order by linkedHashMap */
-        LinkedHashMap<String, String> params = new LinkedHashMap<>();
-        params.put("enrolments[0][roleid]","5");
-        params.put("enrolments[0][userid]", userId.toString());
-        params.put("enrolments[0][courseid]", courseId);
-//        params.put("enrolments[0][timestart]", password);
-//        params.put("enrolments[0][timeend]", password);
-//        params.put("enrolments[0][suspend]", password);
+        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+        params.add("wstoken", token);
+        params.add("moodlewsrestformat", "json");
+        params.add("wsfunction", "enrol_manual_enrol_users");
+        params.add("enrolments[0][roleid]", 5);
+        params.add("enrolments[0][userid]", Integer.valueOf(userId));
+        params.add("enrolments[0][courseid]", Integer.valueOf(courseId));
+        params.add("enrolments[0][username]", username);
+//        params.put("enrolments[0][timestart]", startDate);
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(moodleServiceLoginEndpoint.trim());
 
-        for (Map.Entry<String, String> entry : params.entrySet()) {
-            builder.queryParam(entry.getKey(), entry.getValue());
-        }
+//        for (Map.Entry<String, Object> entry : params.entrySet()) {
+//            builder.queryParam(entry.getKey(), entry.getValue());
+//        }
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity
+                = new HttpEntity<>(params, headers);
         log.info("=== uri === {}", builder.toUriString());
-        HttpEntity<String> response = restTemplate.exchange(builder.toUriString(), HttpMethod.POST, entity, String.class, headers);
+        ResponseEntity<String> response = restTemplate
+                .postForEntity(builder.toUriString(), requestEntity, String.class);
+//        HttpEntity<String> response = restTemplate.exchange(builder.toUriString(), HttpMethod.POST, entity, String.class, headers);
         log.info("==== response from moodle backend - get token user ==== {}", response);
         log.info("==== body from response from moodle backend - get token user ==== {}", response.getBody());
         if(response.getBody().contains("exception")) {
             ExceptionMoodle exception = DataUtil.jsonToObject(response.getBody(), ExceptionMoodle.class);
+            if(DataUtil.isNullOrEmpty(exception.getMessage())) {
+                throw new RuntimeException(response.getBody());
+            }
             throw new RuntimeException(exception.getMessage());
         }
     }

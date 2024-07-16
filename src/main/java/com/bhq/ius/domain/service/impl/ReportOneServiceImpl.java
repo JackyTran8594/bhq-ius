@@ -228,6 +228,7 @@ public class ReportOneServiceImpl implements ReportOneService {
         List<Driver> drivers = DriverMapper.INSTANCE.toEntities(dto.getDriversDto());
         List<Profile> profiles = ProfileMapper.INSTANCE.toEntities(dto.getProfilesDto());
         for (Driver driver: drivers) {
+            driver.setCourse(course);
             List<com.bhq.ius.domain.entity.Document> doc = documents.stream().filter(x -> x.getSoCMT().equals(driver.getSoCMT())).map( x -> {
                 x.setDriver(driver);
                 return x;
