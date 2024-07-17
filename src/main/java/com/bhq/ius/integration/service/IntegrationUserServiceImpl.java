@@ -147,9 +147,8 @@ public class IntegrationUserServiceImpl implements IntegrationUserSerive {
             for (Driver item : listDriver) {
                 Course course = item.getCourse();
                 try {
-                    /* get token */
-                    MoodleTokenMobile token = moodleService.getTokenUserFromMoodle(item.getMaDK(), DataUtil.convertLocalDateToString(item.getNgaySinh()));
-                    moodleService.updateUserEnroll(item.getIdUserMoodle(), course.getIdCourseMoodle(), token.getToken(), item.getMaDK());
+                  
+                    moodleService.updateUserEnroll(item.getIdUserMoodle(), course.getIdCourseMoodle());
                     item.setStateEnroll(RecordState.SUBMITTED);
                 } catch (Exception exception) {
                     log.error("=== error in UpdateUserPicture === {}", exception.getMessage());
