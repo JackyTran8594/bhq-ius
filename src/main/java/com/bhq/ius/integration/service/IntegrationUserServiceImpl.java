@@ -120,6 +120,8 @@ public class IntegrationUserServiceImpl implements IntegrationUserSerive {
                 Profile profile = item.getProfile();
                 try {
                     /* get token */
+                    log.info("===== driver ===== {}", DataUtil.parseToString(item));
+                    log.info("===== profile ===== {}", DataUtil.parseToString(profile));
                     MoodleTokenMobile token = moodleService.getTokenUserFromMoodle(item.getMaDK(), DataUtil.convertLocalDateToString(item.getNgaySinh()));
                     /* upload file */
                     ByteArrayResource resource = new ByteArrayResource(profile.getImageFile());

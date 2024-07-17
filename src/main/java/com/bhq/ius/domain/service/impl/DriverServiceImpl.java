@@ -119,6 +119,16 @@ public class DriverServiceImpl implements DriverService {
         Page<DriverDto> listDTO = repository.findAll(spec, page).map(entity -> {
             DriverDto dto = new DriverDto();
             BeanUtils.copyProperties(entity, dto);
+            dto.setCourseId(entity.getCourse().getId());
+            dto.setStateProfile(!DataUtil.isNullOrEmpty(entity.getProfile().getState()) ? entity.getProfile().getState() : null);
+            if (!DataUtil.isNullOrEmpty(entity.getProfile().getError())) {
+                String error = entity.getProfile().getError();
+                dto.setErrorProfile((error.length() <= 100) ? error : error.substring(0, 100));
+            }
+            dto.setStateEnroll(!DataUtil.isNullOrEmpty(entity.getStateEnroll()) ? entity.getStateEnroll() : null);
+            if (!DataUtil.isNullOrEmpty(entity.getErrorEnroll())) {
+                dto.setErrorEnroll((entity.getErrorEnroll().length() <= 100) ? entity.getErrorEnroll() : entity.getErrorEnroll().substring(0, 100));
+            }
             return dto;
         });
         return listDTO;
