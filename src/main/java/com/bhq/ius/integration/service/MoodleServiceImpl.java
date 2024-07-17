@@ -233,7 +233,7 @@ public class MoodleServiceImpl implements MoodleService {
     }
 
     @Override
-    public void updateUserEnroll(String userId, String courseId, String token, String username) {
+    public void updateUserEnroll(String userId, String courseId) {
         RestTemplate restTemplate = buildingDefaultResTemplate();
         HttpHeaders  headers = buildingDefaultHeaders();
         HttpEntity<String> entity = new HttpEntity<>(headers);
@@ -243,27 +243,22 @@ public class MoodleServiceImpl implements MoodleService {
         long startDate = LocalDate.now().toEpochSecond(LocalTime.NOON, ZoneOffset.MIN);
         /* keeping param with order by linkedHashMap */
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-        params.add("wstoken", token);
+        params.add("wstoken", moodleServiceUrl.trim());
         params.add("moodlewsrestformat", "json");
         params.add("wsfunction", "enrol_manual_enrol_users");
         params.add("enrolments[0][roleid]", 5);
         params.add("enrolments[0][userid]", Integer.valueOf(userId));
         params.add("enrolments[0][courseid]", Integer.valueOf(courseId));
-        params.add("enrolments[0][username]", username);
-//        params.put("enrolments[0][timestart]", startDate);
+        params.put("enrolments[0][timestart]", startDate);
 
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(moodleServiceLoginEndpoint.trim());
-
-//        for (Map.Entry<String, Object> entry : params.entrySet()) {
-//            builder.queryParam(entry.getKey(), entry.getValue());
-//        }
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(moodleServiceUrl.trim());
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity
                 = new HttpEntity<>(params, headers);
         log.info("=== uri === {}", builder.toUriString());
         ResponseEntity<String> response = restTemplate
                 .postForEntity(builder.toUriString(), requestEntity, String.class);
-//        HttpEntity<String> response = restTemplate.exchange(builder.toUriString(), HttpMethod.POST, entity, String.class, headers);
+
         log.info("==== response from moodle backend - get token user ==== {}", response);
         log.info("==== body from response from moodle backend - get token user ==== {}", response.getBody());
         if(response.getBody().contains("exception")) {
