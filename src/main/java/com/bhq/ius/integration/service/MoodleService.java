@@ -16,7 +16,7 @@ public interface MoodleService {
     MoodleCourseCategory getCourseCategoryDetailFromMoodleBackend(String key, String value);
     MoodleUploadFile uploadFileInMoodelWithDedicatedEndpoint(ByteArrayResource byteArrayResource, String fileName , String tokenForUser, String userId);
     MoodleTokenMobile getTokenUserFromMoodle(String username, String password);
-    void updateUserEnroll(String userId, String courseId, String token, String username);
+    void updateUserEnroll(String userId, String courseId);
     void updateUserPicture(String token, String draftItemId, String userId);
 
 }
