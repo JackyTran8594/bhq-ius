@@ -236,20 +236,19 @@ public class MoodleServiceImpl implements MoodleService {
     public void updateUserEnroll(String userId, String courseId) {
         RestTemplate restTemplate = buildingDefaultResTemplate();
         HttpHeaders  headers = buildingDefaultHeaders();
-        HttpEntity<String> entity = new HttpEntity<>(headers);
 
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         long startDate = LocalDate.now().toEpochSecond(LocalTime.NOON, ZoneOffset.MIN);
         /* keeping param with order by linkedHashMap */
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-        params.add("wstoken", moodleServiceUrl.trim());
+        params.add("wstoken", moodleServiceToken.trim());
         params.add("moodlewsrestformat", "json");
         params.add("wsfunction", "enrol_manual_enrol_users");
         params.add("enrolments[0][roleid]", 5);
         params.add("enrolments[0][userid]", Integer.valueOf(userId));
         params.add("enrolments[0][courseid]", Integer.valueOf(courseId));
-        params.put("enrolments[0][timestart]", startDate);
+        params.add("enrolments[0][timestart]", Long.valueOf(startDate));
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(moodleServiceUrl.trim());
 

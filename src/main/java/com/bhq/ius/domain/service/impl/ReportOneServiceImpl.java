@@ -167,9 +167,11 @@ public class ReportOneServiceImpl implements ReportOneService {
     }
 
     @Override
-    public BaseResponseData<ReportOneInfoDto> getReportOneInfo(Long id) {
+    public BaseResponseData<ReportOneInfoDto> getReportOneInfo(Optional<Long> id) {
         BaseResponseData<ReportOneInfoDto> responseData = new BaseResponseData<>();
         ReportOneInfoDto reportOneInfoDto = new ReportOneInfoDto();
+//        Optional<Course> course = courseRepository.findById(id);
+//        if (course.isPresent()) {
         Long driverSuccess = driverRepository.countByStateIn(Collections.singletonList(RecordState.SUBMITTED));
         Long driverFailed = driverRepository.countByStateIn(Collections.singletonList(RecordState.FAILED));
         Long driverNotSubmitted = driverRepository.count() - driverSuccess - driverFailed;
@@ -195,6 +197,7 @@ public class ReportOneServiceImpl implements ReportOneService {
         reportOneInfoDto.setEnrollNotSubmitted(enrollNotSubmitted);
 
         responseData.setData(reportOneInfoDto);
+//        }
 
         return responseData;
     }
@@ -227,15 +230,15 @@ public class ReportOneServiceImpl implements ReportOneService {
         List<com.bhq.ius.domain.entity.Document> documents = DocumentMapper.INSTANCE.toEntities(dto.getDocumentsDto());
         List<Driver> drivers = DriverMapper.INSTANCE.toEntities(dto.getDriversDto());
         List<Profile> profiles = ProfileMapper.INSTANCE.toEntities(dto.getProfilesDto());
-        for (Driver driver: drivers) {
+        for (Driver driver : drivers) {
             driver.setCourse(course);
-            List<com.bhq.ius.domain.entity.Document> doc = documents.stream().filter(x -> x.getSoCMT().equals(driver.getSoCMT())).map( x -> {
+            List<com.bhq.ius.domain.entity.Document> doc = documents.stream().filter(x -> x.getSoCMT().equals(driver.getSoCMT())).map(x -> {
                 x.setDriver(driver);
                 return x;
             }).toList();
-            Optional<Profile> profile = profiles.stream().filter(x -> x.getSoCMT().equals(driver.getSoCMT())).map( x->{
+            Optional<Profile> profile = profiles.stream().filter(x -> x.getSoCMT().equals(driver.getSoCMT())).map(x -> {
                 byte[] byteImageArray = DataUtil.base64Jp2toImageJpg(x.getAnhChanDung());
-                if(!DataUtil.isNullOrEmpty(byteImageArray)) {
+                if (!DataUtil.isNullOrEmpty(byteImageArray)) {
                     x.setImageFile(byteImageArray);
                 }
                 x.setDriver(driver);
@@ -262,7 +265,7 @@ public class ReportOneServiceImpl implements ReportOneService {
                 driverDto.setHoVaTen(XmlUtil.getTagValue("HO_VA_TEN", element));
 
 
-                if(!DataUtil.isNullOrEmpty(XmlUtil.getTagValue("NGAY_SINH", element))) {
+                if (!DataUtil.isNullOrEmpty(XmlUtil.getTagValue("NGAY_SINH", element))) {
                     String ngaySinh = DataUtil.convertDateOfBirthWithFormat(XmlUtil.getTagValue("NGAY_SINH", element));
                     driverDto.setNgaySinh(DataUtil.convertStringToLocalDate(ngaySinh, IusConstant.DATE_FORMAT));
                 }
@@ -277,7 +280,7 @@ public class ReportOneServiceImpl implements ReportOneService {
                 driverDto.setSoCMT(XmlUtil.getTagValue("SO_CMT", element));
 
                 String ngayCapCMT = XmlUtil.getTagValue("NGAY_CAP_CMT", element);
-                if(!DataUtil.isNullOrEmpty(ngayCapCMT)) {
+                if (!DataUtil.isNullOrEmpty(ngayCapCMT)) {
                     driverDto.setNgayCapCMT(DataUtil.convertStringToLocalDate(ngayCapCMT, IusConstant.DATE_FORMAT));
                 }
 
@@ -296,7 +299,7 @@ public class ReportOneServiceImpl implements ReportOneService {
 
     protected List<Driver> getListDriver(List<Long> listId) {
         List<Driver> drivers = new ArrayList<>();
-        if(DataUtil.isNullOrEmpty(listId)) {
+        if (DataUtil.isNullOrEmpty(listId)) {
             drivers = driverRepository.findAllByStateNullOrStateNotIn(Collections.singletonList(RecordState.SUBMITTED));
         } else {
             drivers = driverRepository.findAllById(listId);
@@ -306,7 +309,7 @@ public class ReportOneServiceImpl implements ReportOneService {
 
     protected List<Course> getListCourse(List<Long> listId) {
         List<Course> items = new ArrayList<>();
-        if(DataUtil.isNullOrEmpty(listId)) {
+        if (DataUtil.isNullOrEmpty(listId)) {
             items = courseRepository.findAllByStateNullOrStateNotIn(Collections.singletonList(RecordState.SUBMITTED));
         } else {
             items = courseRepository.findAllById(listId);
@@ -316,7 +319,7 @@ public class ReportOneServiceImpl implements ReportOneService {
 
     protected List<Profile> getListProfile(List<Long> listId) {
         List<Profile> items = new ArrayList<>();
-        if(DataUtil.isNullOrEmpty(listId)) {
+        if (DataUtil.isNullOrEmpty(listId)) {
             items = profileRepository.findAllByStateNullOrStateNotIn(Collections.singletonList(RecordState.SUBMITTED));
         } else {
             items = profileRepository.findAllById(listId);
@@ -341,7 +344,7 @@ public class ReportOneServiceImpl implements ReportOneService {
                 courseDto.setSoBCI(XmlUtil.getTagValue("SO_BCI", element));
 
                 String ngayBCi = XmlUtil.getTagValue("NGAY_BCI", element);
-                if(!DataUtil.isNullOrEmpty(ngayBCi)) {
+                if (!DataUtil.isNullOrEmpty(ngayBCi)) {
                     courseDto.setNgayBCI(DataUtil.convertStringToLocalDate(ngayBCi, IusConstant.DATE_FORMAT));
                 }
 
@@ -349,24 +352,24 @@ public class ReportOneServiceImpl implements ReportOneService {
                 courseDto.setSoHocSinh(XmlUtil.getTagValue("SO_HOC_SINH", element));
 
                 String ngayKhaiGiang = XmlUtil.getTagValue("NGAY_KHAI_GIANG", element);
-                if(!DataUtil.isNullOrEmpty(ngayKhaiGiang)) {
+                if (!DataUtil.isNullOrEmpty(ngayKhaiGiang)) {
                     courseDto.setNgayKhaiGiang(DataUtil.convertStringToLocalDate(ngayKhaiGiang, IusConstant.DATE_FORMAT));
                 }
 
                 String ngayBeGiang = XmlUtil.getTagValue("NGAY_BE_GIANG", element);
-                if(!DataUtil.isNullOrEmpty(ngayBeGiang)) {
+                if (!DataUtil.isNullOrEmpty(ngayBeGiang)) {
                     courseDto.setNgayBeGiang(DataUtil.convertStringToLocalDate(ngayBeGiang, IusConstant.DATE_FORMAT));
                 }
 
                 courseDto.setSoQDKG(XmlUtil.getTagValue("SO_QD_KG", element));
 
                 String ngayQDKG = XmlUtil.getTagValue("NGAY_QD_KG", element);
-                if(!DataUtil.isNullOrEmpty(ngayQDKG)) {
+                if (!DataUtil.isNullOrEmpty(ngayQDKG)) {
                     courseDto.setNgayQDKG(DataUtil.convertStringToLocalDate(ngayQDKG, IusConstant.DATE_FORMAT));
                 }
 
                 String ngaySatHach = XmlUtil.getTagValue("NGAY_SAT_HACH", element);
-                if(!DataUtil.isNullOrEmpty(ngaySatHach)) {
+                if (!DataUtil.isNullOrEmpty(ngaySatHach)) {
                     courseDto.setNgaySatHach(DataUtil.convertStringToLocalDate(ngaySatHach, IusConstant.DATE_FORMAT));
                 }
 
@@ -383,7 +386,7 @@ public class ReportOneServiceImpl implements ReportOneService {
     private ProfileDto getProfile(NodeList nodeList, String soCMT, String soCMTCu, String uuid) {
         try {
             ProfileDto dto = new ProfileDto();
-            for (int j = 0; j < nodeList.getLength(); j ++) {
+            for (int j = 0; j < nodeList.getLength(); j++) {
                 Node node = nodeList.item(j);
                 if (node.getNodeType() == Node.ELEMENT_NODE && XmlElement.HO_SO.name().equals(node.getNodeName())) {
                     Element element = (Element) node;
@@ -392,7 +395,7 @@ public class ReportOneServiceImpl implements ReportOneService {
                     dto.setTenDVNhanHoSo(XmlUtil.getTagValue("TEN_DV_NHAN_HOSO", element));
                     String ngayNhanHoSo = XmlUtil.getTagValue("NGAY_NHAN_HOSO", element);
 
-                    if(!DataUtil.isNullOrEmpty(ngayNhanHoSo)) {
+                    if (!DataUtil.isNullOrEmpty(ngayNhanHoSo)) {
                         dto.setNgayNhanHoSo(ngayNhanHoSo);
                     }
 
@@ -403,7 +406,7 @@ public class ReportOneServiceImpl implements ReportOneService {
                     dto.setChatLuongAnh(XmlUtil.getTagValue("CHAT_LUONG_ANH", element));
 
                     String ngayThuNhanAnh = XmlUtil.getTagValue("NGAY_THU_NHAN_ANH", element);
-                    if(!DataUtil.isNullOrEmpty(ngayThuNhanAnh)) {
+                    if (!DataUtil.isNullOrEmpty(ngayThuNhanAnh)) {
                         dto.setNgayThuNhanAnh(ngayThuNhanAnh);
                     }
 
@@ -415,15 +418,15 @@ public class ReportOneServiceImpl implements ReportOneService {
                     dto.setNoiCapGPLXDaCo(XmlUtil.getTagValue("NOI_CAP_GPLX_DACO", element));
 
                     String ngayCapGPLXDaCo = XmlUtil.getTagValue("NGAY_CAP_GPLX_DACO", element);
-                    if(!DataUtil.isNullOrEmpty(ngayCapGPLXDaCo)) {
+                    if (!DataUtil.isNullOrEmpty(ngayCapGPLXDaCo)) {
                         dto.setNgayCapGPLXDaCo(ngayCapGPLXDaCo);
                     }
                     String ngayHHGPLXDaCo = XmlUtil.getTagValue("NGAY_HH_GPLX_DACO", element);
-                    if(!DataUtil.isNullOrEmpty(ngayHHGPLXDaCo)) {
+                    if (!DataUtil.isNullOrEmpty(ngayHHGPLXDaCo)) {
                         dto.setNgayHHGPLXDaCo(ngayHHGPLXDaCo);
                     }
                     String ngayTTGPLXDaCo = XmlUtil.getTagValue("NGAY_TT_GPLX_DACO", element);
-                    if(!DataUtil.isNullOrEmpty(ngayTTGPLXDaCo)) {
+                    if (!DataUtil.isNullOrEmpty(ngayTTGPLXDaCo)) {
                         dto.setNgayTTGPLXDaCo(ngayTTGPLXDaCo);
                     }
                     dto.setMaNoiHocLaiXe(XmlUtil.getTagValue("MA_NOI_HOC_LAIXE", element));
@@ -455,17 +458,17 @@ public class ReportOneServiceImpl implements ReportOneService {
     private List<DocumentDto> getDocument(NodeList nodeList, String soCMT, String soCMTCu, String uuid) {
         try {
             List<DocumentDto> listDto = new ArrayList<>();
-            for (int j = 0; j < nodeList.getLength(); j ++) {
+            for (int j = 0; j < nodeList.getLength(); j++) {
                 Node childNode = nodeList.item(j);
                 DocumentDto dto = new DocumentDto();
                 if (childNode.getNodeType() == Node.ELEMENT_NODE && XmlElement.GIAY_TO.name().equals(childNode.getNodeName())) {
                     Element element = (Element) childNode;
                     dto.setMaGiayTo(XmlUtil.getTagValue("MA_GIAY_TO", element));
                     dto.setTenGiayTo(XmlUtil.getTagValue("TEN_GIAY_TO", element));
-                    if(!DataUtil.isNullOrEmpty(soCMT)) {
+                    if (!DataUtil.isNullOrEmpty(soCMT)) {
                         dto.setSoCMT(soCMT);
                     }
-                    if(!DataUtil.isNullOrEmpty(soCMTCu)) {
+                    if (!DataUtil.isNullOrEmpty(soCMTCu)) {
                         dto.setSoCMTCu(soCMTCu);
                     }
                     dto.setDriver_uuid(uuid);

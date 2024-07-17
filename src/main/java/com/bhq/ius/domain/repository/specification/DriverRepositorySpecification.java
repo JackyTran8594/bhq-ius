@@ -1,5 +1,6 @@
 package com.bhq.ius.domain.repository.specification;
 
+import com.bhq.ius.domain.entity.Course;
 import com.bhq.ius.domain.entity.Driver;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 

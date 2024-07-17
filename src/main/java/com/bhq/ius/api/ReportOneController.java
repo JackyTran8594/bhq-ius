@@ -68,8 +68,8 @@ public class ReportOneController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/get-report-one-info/{id}")
-    public ResponseEntity<BaseResponseData<?>> getInfo(@PathVariable(name = "id") Long id) {
+    @GetMapping("/get-report-one-info")
+    public ResponseEntity<BaseResponseData<?>> getInfo(@RequestParam(name = "id") Optional<Long> id) {
         BaseResponseData<?> response = service.getReportOneInfo(id);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
