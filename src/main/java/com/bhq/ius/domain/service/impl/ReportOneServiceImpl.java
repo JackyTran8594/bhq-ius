@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -58,8 +59,11 @@ public class ReportOneServiceImpl implements ReportOneService {
 
     @Override
     @Transactional
-    public List<DriverDto> uploadFileXml(MultipartFile file) {
+    public CourseDto uploadFileXml(MultipartFile file) {
         try {
+            /* remove old record */
+            removeOldRecord();
+
             DriverXmlDto dto = new DriverXmlDto();
             dto.setDriversDto(new ArrayList<>());
             dto.setDocumentsDto(new ArrayList<>());
@@ -95,9 +99,10 @@ public class ReportOneServiceImpl implements ReportOneService {
 
             }
 
+            /* save into db */
             saveIntoDb(dto);
 
-            return dto.getDriversDto();
+            return dto.getCourseDto();
         } catch (Exception e) {
             log.error("==== error in uploadFileXml ===== {}", e.getMessage());
             throw new RuntimeException(e);
@@ -105,10 +110,10 @@ public class ReportOneServiceImpl implements ReportOneService {
     }
 
     @Override
-    public BaseResponseData<List<Long>> submitDriver(List<Long> listId) {
+    public BaseResponseData<List<Long>> submitDriver(List<Long> listId, Long courseId) {
         BaseResponseData<List<Long>> responseData = new BaseResponseData<>();
         try {
-            List<Driver> drivers = getListDriver(listId);
+            List<Driver> drivers = getListDriver(listId, courseId);
             List<Long> listIdSubmitted = integrationUserSerive.CreateDrivers(drivers);
             responseData.initData(listIdSubmitted);
         } catch (Exception exception) {
@@ -136,11 +141,10 @@ public class ReportOneServiceImpl implements ReportOneService {
     }
 
     @Override
-    public BaseResponseData<List<Long>> submitAvatar(List<Long> listId) {
+    public BaseResponseData<List<Long>> submitAvatar(List<Long> listId, Long courseId) {
         BaseResponseData<List<Long>> responseData = new BaseResponseData<>();
         try {
-            List<Driver> drivers = getListDriver(listId);
-//            List<Driver> listDriver = driverRepository.findAllById(listId);
+            List<Driver> drivers = getListDriverForAvatar(listId, courseId);
             List<Long> listIdSubmitted = integrationUserSerive.UpdateUserPicture(drivers);
             responseData.initData(listIdSubmitted);
         } catch (Exception exception) {
@@ -152,10 +156,10 @@ public class ReportOneServiceImpl implements ReportOneService {
     }
 
     @Override
-    public BaseResponseData<List<Long>> submitEnroll(List<Long> listId) {
+    public BaseResponseData<List<Long>> submitEnroll(List<Long> listId, Long courseId) {
         BaseResponseData<List<Long>> responseData = new BaseResponseData<>();
         try {
-            List<Driver> drivers = getListDriver(listId);
+            List<Driver> drivers = getListDriverForEnroll(listId, courseId);
             List<Long> listIdSubmitted = integrationUserSerive.UpdateUserEnroll(drivers);
             responseData.initData(listIdSubmitted);
         } catch (Exception exception) {
@@ -203,10 +207,10 @@ public class ReportOneServiceImpl implements ReportOneService {
     }
 
     @Override
-    public BaseResponseData<List<Driver>> testGetDriver(List<Long> listId) {
+    public BaseResponseData<List<Driver>> testGetDriver(List<Long> listId, Long courseId) {
         BaseResponseData<List<Driver>> responseData = new BaseResponseData<>();
         try {
-            List<Driver> drivers = getListDriver(listId);
+            List<Driver> drivers = getListDriver(listId, courseId);
             responseData.initData(drivers);
             return responseData;
         } catch (Exception exception) {
@@ -222,6 +226,21 @@ public class ReportOneServiceImpl implements ReportOneService {
         BaseResponseData<?> responseData = new BaseResponseData<>();
         integrationUserSerive.testPostImage();
         return responseData;
+    }
+
+
+    @Transactional
+    public void removeOldRecord() {
+        try {
+            log.info("===== removeOldRecord =====");
+            documentRepository.deleteAll();
+            profileRepository.deleteAll();
+            driverRepository.deleteAll();
+            courseRepository.deleteAll();
+            log.info("===== removeOldRecord success =====");
+        } catch (Exception exception) {
+            log.error("===== error removeOldRecord ==== {}", exception.getMessage());
+        }
     }
 
     private void saveIntoDb(DriverXmlDto dto) {
@@ -247,7 +266,8 @@ public class ReportOneServiceImpl implements ReportOneService {
             driverRepository.save(driver);
         }
 
-        courseRepository.save(course);
+        Course courseEntity = courseRepository.save(course);
+        dto.setCourseDto(CourseMapper.INSTANCE.toDto(courseEntity));
         dto.setDriversDto(DriverMapper.INSTANCE.toListDto(drivers));
         profileRepository.saveAll(profiles);
         documentRepository.saveAll(documents);
@@ -297,10 +317,31 @@ public class ReportOneServiceImpl implements ReportOneService {
         }
     }
 
-    protected List<Driver> getListDriver(List<Long> listId) {
+    protected List<Driver> getListDriver(List<Long> listId, Long courseId) {
         List<Driver> drivers = new ArrayList<>();
         if (DataUtil.isNullOrEmpty(listId)) {
-            drivers = driverRepository.findAllByStateNullOrStateNotIn(Collections.singletonList(RecordState.SUBMITTED));
+            drivers = driverRepository.findAllByStateNullOrStateNotIn(courseId);
+        } else {
+            drivers = driverRepository.findAllById(listId);
+        }
+        return drivers;
+    }
+
+    protected List<Driver> getListDriverForEnroll(List<Long> listId, Long courseId) {
+        List<Driver> drivers = new ArrayList<>();
+        Optional<Course> course = courseRepository.findById(courseId);
+        if (DataUtil.isNullOrEmpty(listId)) {
+            drivers = driverRepository.findAllByStateEnrollNullOrStateEnrollNotInAndCourse(Collections.singletonList(RecordState.SUBMITTED), course.get());
+        } else {
+            drivers = driverRepository.findAllById(listId);
+        }
+        return drivers;
+    }
+
+    protected List<Driver> getListDriverForAvatar(List<Long> listId, Long courseId) {
+        List<Driver> drivers = new ArrayList<>();
+        if (DataUtil.isNullOrEmpty(listId)) {
+            drivers = driverRepository.findAllByStateNullOrStateNotInWithProfile(courseId);
         } else {
             drivers = driverRepository.findAllById(listId);
         }

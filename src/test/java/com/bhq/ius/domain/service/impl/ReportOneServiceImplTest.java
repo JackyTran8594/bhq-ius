@@ -43,10 +43,10 @@ class ReportOneServiceImplTest {
 
         driverList.add(driver1);
         driverList.add(driver2);
-        when(repository.findAllByStateNullOrStateNotIn(Collections.singletonList(RecordState.SUBMITTED))).thenReturn(Collections.singletonList(driver2));
+        when(repository.findAllByStateNullOrStateNotIn(any())).thenReturn(Collections.singletonList(driver2));
 
-        assertEquals(1, service.getListDriver(null).size());
-        assertEquals("Test2", service.getListDriver(null).get(0).getHoVaTen());
+        assertEquals(1, service.getListDriver(null, null).size());
+        assertEquals("Test2", service.getListDriver(null, null).get(0).getHoVaTen());
 
     }
 

@@ -1,5 +1,6 @@
 package com.bhq.ius.api;
 
+import com.bhq.ius.domain.dto.CourseDto;
 import com.bhq.ius.domain.dto.DriverDto;
 import com.bhq.ius.domain.dto.DriverXmlDto;
 import com.bhq.ius.domain.dto.UserDto;
@@ -31,22 +32,22 @@ public class ReportOneController {
     private ReportOneService service;
 
     @PostMapping(value = "/upload-xml")
-    public ResponseEntity<BaseResponseData<List<DriverDto>>> uploadXml(@RequestParam("file") MultipartFile file) {
-        BaseResponseData<List<DriverDto>> response = new BaseResponseData<>();
-        List<DriverDto> dto = service.uploadFileXml(file);
+    public ResponseEntity<BaseResponseData<CourseDto>> uploadXml(@RequestParam("file") MultipartFile file) {
+        BaseResponseData<CourseDto> response = new BaseResponseData<>();
+        CourseDto dto = service.uploadFileXml(file);
         response.initData(dto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/submit-driver")
-    public ResponseEntity<BaseResponseData<?>> submitDriver(@RequestBody List<Long> listId) {
-        BaseResponseData<?> response = service.submitDriver(listId);
+    public ResponseEntity<BaseResponseData<?>> submitDriver(@RequestParam(name = "courseId") Long courseId, @RequestBody List<Long> listId) {
+        BaseResponseData<?> response = service.submitDriver(listId, courseId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/test-get-driver")
-    public ResponseEntity<BaseResponseData<?>> testGetDriver(@RequestBody List<Long> listId) {
-        BaseResponseData<?> response = service.testGetDriver(listId);
+    public ResponseEntity<BaseResponseData<?>> testGetDriver(@RequestParam(name = "courseId") Long courseId, @RequestBody List<Long> listId) {
+        BaseResponseData<?> response = service.testGetDriver(listId, courseId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -57,14 +58,14 @@ public class ReportOneController {
     }
 
     @PostMapping("/submit-avatar")
-    public ResponseEntity<BaseResponseData<?>> submitAvatar(@RequestBody List<Long> listId) {
-        BaseResponseData<?> response = service.submitAvatar(listId);
+    public ResponseEntity<BaseResponseData<?>> submitAvatar(@RequestParam(name = "courseId") Long courseId, @RequestBody List<Long> listId) {
+        BaseResponseData<?> response = service.submitAvatar(listId, courseId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/submit-enroll")
-    public ResponseEntity<BaseResponseData<?>> submitEnroll(@RequestBody List<Long> listId) {
-        BaseResponseData<?> response = service.submitEnroll(listId);
+    public ResponseEntity<BaseResponseData<?>> submitEnroll(@RequestParam(name = "courseId") Long courseId, @RequestBody List<Long> listId) {
+        BaseResponseData<?> response = service.submitEnroll(listId, courseId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

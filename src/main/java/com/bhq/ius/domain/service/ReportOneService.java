@@ -1,5 +1,6 @@
 package com.bhq.ius.domain.service;
 
+import com.bhq.ius.domain.dto.CourseDto;
 import com.bhq.ius.domain.dto.DriverDto;
 import com.bhq.ius.domain.dto.ReportOneInfoDto;
 import com.bhq.ius.domain.dto.UserDto;
@@ -13,13 +14,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ReportOneService {
-    List<DriverDto> uploadFileXml(MultipartFile file);
-    BaseResponseData<List<Long>> submitDriver(List<Long> listId);
+    CourseDto uploadFileXml(MultipartFile file);
+    BaseResponseData<List<Long>> submitDriver(List<Long> listId, Long courseId);
     BaseResponseData<List<Long>> submitCourse(List<Long> listId);
-    BaseResponseData<List<Long>> submitAvatar(List<Long> listId);
-    BaseResponseData<List<Long>> submitEnroll(List<Long> listId);
+    BaseResponseData<List<Long>> submitAvatar(List<Long> listId, Long courseId);
+    BaseResponseData<List<Long>> submitEnroll(List<Long> listId, Long courseId);
     BaseResponseData<ReportOneInfoDto> getReportOneInfo(Optional<Long> id);
-    BaseResponseData<List<Driver>> testGetDriver(List<Long> listId);
+    BaseResponseData<List<Driver>> testGetDriver(List<Long> listId, Long courseId);
     BaseResponseData<?> testPostImage();
 
 }
