@@ -29,6 +29,10 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
   liquibase:
     enabled: false
+  servlet:
+    multipart:
+      max-file-size: 120MB
+      max-request-size: 120MB
 logging:
   level:
     org:
